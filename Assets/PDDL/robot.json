@@ -1,0 +1,141 @@
+{
+    "types": [
+        {
+            "room": {},
+            "arm": {},
+            "box": {}
+        }
+    ],
+    "predicates": [
+        {
+            "robot-at": {
+                "room": {}
+            },
+            "box-at": {
+                "box": {
+                    "room": {}
+                }
+            },
+            "free": {
+                "arm": {}
+            },
+            "carry": {
+                "box": {
+                    "arm": {}
+                }
+            }
+        }
+    ],
+    "operations": [
+        {
+            "move": {
+                "parameters": {
+                    "x": {
+                        "room": {}
+                    },
+                    "y": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "robot-at": {
+                        "x": {}
+                    }
+                },
+                "effect": {
+                    "posit": {
+                        "robot-at": {
+                            "y": {}
+                        }
+                    },
+                    "negate": {
+                        "robot-at": {
+                            "x": {}
+                        }
+                    }
+                }
+            },
+            "pickup": {
+                "parameters": {
+                    "x": {
+                        "box": {}
+                    },
+                    "y": {
+                        "arm": {}
+                    },
+                    "z": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "free": {
+                        "y": {}
+                    },
+                    "robot-at": {
+                        "z": {}
+                    },
+                    "box-at": {
+                        "x": {},
+                        "z": {}
+                    }
+                },
+                "effect": {
+                    "posit": {
+                        "carry": {
+                            "X": {},
+                            "y": {}
+                        }
+                    },
+                    "negate": {
+                        "box-at": {
+                            "x": {},
+                            "z": {}
+                        },
+                        "free": {
+                            "y": {}
+                        }
+                    }
+                }
+            },
+            "putdown": {
+                "parameters": {
+                    "x": {
+                        "box": {}
+                    },
+                    "y": {
+                        "arm": {}
+                    },
+                    "z": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "carry": {
+                        "x": {},
+                        "y": {}
+                    },
+                    "robot-at": {
+                        "z": {}
+                    }
+                },
+                "effect": {
+                    "posit": {
+                        "box-at": {
+                            "x": {},
+                            "z": {}
+                        },
+                        "free": {
+                            "y": {}
+                        }
+                    },
+                    "negate": {
+                        "carry": {
+                            "X": {},
+                            "y": {}
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
