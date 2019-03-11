@@ -31,22 +31,38 @@ namespace Planner
         }
 
         //public void GroundActions (HSPOperator[] _operators, OBase[] _objects) {
-        public void GroundActions(JsonNode _operators, JsonNode _objects)
+        public List<HSPAction> GroundActions(List<JsonNode> _domain)
         {
 
-            List<HSPAction> action = new List<HSPAction>();
+            List<HSPAction> actions = new List<HSPAction>();
+
+            foreach(var dnode in _domain) {
+                if (dnode.UserDefinedTypeName == Config.Constants.JSON_NODELABEL_OPERATORS) {
+                    
+                    foreach(var pnode in _problem) {
+                        if (pnode.UserDefinedTypeName == Config.Constants.JSON_NODELABEL_OBJECTS) {
+                            actions = GetGroundActionList(dnode, pnode);
+                        }
+                    }
+
+                }
+            }
+
+            return actions;
+
+        }
+
+        private List<HSPAction> GetGroundActionList(JsonNode _operators, JsonNode _objects) {
             
             foreach(var op in _operators.Members) {
-                
-                
-
 
                 //string[] variables = [ param.name for param in operator.params ]            
-                //objects = [ p_objs[param.type] for param in operator.params ]
-
+                //objects = [ p_objs[param.type] for param in operator.params 
 
             
             }
+
+
 
         }
 

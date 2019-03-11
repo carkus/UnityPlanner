@@ -19,8 +19,6 @@ public class main : MonoBehaviour
 
     public OBase[] ObjBase;
 
-    // Start is called before the first frame update
-
     /// <summary>
     /// Awake is called when the script instance is being loaded.
     /// </summary>
@@ -28,8 +26,10 @@ public class main : MonoBehaviour
     {
     }   
 
+    // Start is called before the first frame update
     void Start()
     {        
+
         planManager = new PlanManager();
         
         worldManager = new WorldManager();
