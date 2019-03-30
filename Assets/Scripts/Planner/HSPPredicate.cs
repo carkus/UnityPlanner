@@ -25,7 +25,6 @@ public class HSPPredicate {
         _args = DeriveArgs(args);
         _name = name;
 
-
     }
 
     public List<HSPTerm> DeriveArgs(IDictionary<string, JsonNode> nodes) {
@@ -53,7 +52,7 @@ public class HSPPredicate {
         return true;
     }
             
-    public int Ground() {
+    public int Ground(Dictionary<string, List<string>> subst) {
 
         /*
         args = []
@@ -64,6 +63,13 @@ public class HSPPredicate {
             args.append(arg)
         return Predicate(self._name, args)
          */
+
+        List<HSPTerm> args = new List<HSPTerm>();
+        foreach(var arg in _args) {
+            //if (subst[arg] != null) {
+
+            //}
+        }
 
         return _args.Count;
     }    

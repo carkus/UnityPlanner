@@ -7,7 +7,7 @@ using JsonToDataContract;
 
 public class HSPLiteral {
 
-    private HSPPredicate _predicate;
+    public HSPPredicate _predicate;
     private bool _positive;
    
     public HSPLiteral(HSPPredicate predicate, bool positive) {

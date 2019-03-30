@@ -47,9 +47,7 @@ public class JSONParser
     List<JsonNode> domainNodes;
     List<JsonNode> problemNodes;
 
-    //Singleton
-    private static JSONParser instance;
-    private JSONParser() { 
+    public JSONParser() { 
         typeParser = TypeParser.Instance;
         predicateParser = PredicateParser.Instance;
         operatorParser = OperatorParser.Instance;
@@ -59,7 +57,7 @@ public class JSONParser
         goalStateParser = StateParser.Instance;
     }
 
-    public static JSONParser Instance
+    /*public static JSONParser Instance
     {
         get
         {
@@ -69,9 +67,16 @@ public class JSONParser
             }
             return instance;
         }
-    }
+    }*/
 
-    public List<JsonNode> ParseDomain(string ctxt) 
+    public void ParseDomain(string ctxt) 
+    {        
+        domainNodes = new List<JsonNode>();
+        domainNodes.Clear();
+        domainNodes = ParseJSONFilename(ctxt);
+    } 
+
+    /*public List<JsonNode> ParseDomain(string ctxt) 
     {
         
         domainNodes = new List<JsonNode>();
@@ -79,15 +84,13 @@ public class JSONParser
         domainNodes = ParseJSONFilename(ctxt);
         return domainNodes;
 
-    }    
-    public List<JsonNode> ParseProblem(string ctxt) 
-    {
-        
+    } */
+
+    public void ParseProblem(string ctxt) 
+    {        
         problemNodes = new List<JsonNode>();
         problemNodes.Clear();
         problemNodes = ParseJSONFilename(ctxt);
-        return problemNodes;
-
     }
 
     public List<JsonNode> ParseJSONFilename(string ctxt)

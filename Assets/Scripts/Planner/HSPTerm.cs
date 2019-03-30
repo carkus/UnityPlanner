@@ -9,7 +9,8 @@ using JsonToDataContract;
 public class HSPTerm {
 
     public string _name { get; set; }
-    private string _type;
+    public string _type { get; set; }
+
     private string _value;
 
     public HSPTerm (string name, string type, string value) {
@@ -19,7 +20,7 @@ public class HSPTerm {
     }    
 
     public HSPTerm constant() {
-        return this;
+        return new HSPTerm(_name, _type, _value);
     }
 
     public bool IsVariable() {

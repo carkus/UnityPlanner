@@ -9,18 +9,18 @@ using JsonToDataContract;
 public class HSPOperator
 {
 
-    private string _name;
-    private List<HSPTerm> _params { get; set; }
-    private List<HSPLiteral> _precondition { get; set; }
-    private List<HSPLiteral> _effect { get; set; }
+    public string _name;
+    public List<HSPTerm> _params { get; set; }
+    public List<HSPLiteral> _preconditions { get; set; }
+    public List<HSPLiteral> _effects { get; set; }
 
     public HSPOperator(KeyValuePair<string, JsonNode> obj)
     {
 
         _name = obj.Key;
         _params = ParseParameters(obj.Value.Members["parameters"]);
-        _precondition = ParsePrecondition(obj.Value.Members["precondition"]);
-        _effect = ParseEffect(obj.Value.Members["effect"]);
+        _preconditions = ParsePrecondition(obj.Value.Members["precondition"]);
+        _effects = ParseEffect(obj.Value.Members["effect"]);
 
     }
 
