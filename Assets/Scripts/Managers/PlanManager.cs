@@ -35,16 +35,6 @@ public class PlanManager
         _actions = GroundActions();
     }
 
-    /*public List<JsonNode> ParseDomain(string ctxt)
-    {
-        
-        JSONParser parser = JSONParser.Instance;
-        List<JsonNode> domain = new List<JsonNode>(); 
-        domain = parser.ParseDomain(ctxt);
-        return domain;
-
-    }*/
-
     public void ParseDomain(string ctxt)
     {
         _domain = new JSONParser();

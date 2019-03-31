@@ -57,34 +57,12 @@ public class JSONParser
         goalStateParser = StateParser.Instance;
     }
 
-    /*public static JSONParser Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = new JSONParser();
-            }
-            return instance;
-        }
-    }*/
-
     public void ParseDomain(string ctxt) 
     {        
         domainNodes = new List<JsonNode>();
         domainNodes.Clear();
         domainNodes = ParseJSONFilename(ctxt);
     } 
-
-    /*public List<JsonNode> ParseDomain(string ctxt) 
-    {
-        
-        domainNodes = new List<JsonNode>();
-        domainNodes.Clear();
-        domainNodes = ParseJSONFilename(ctxt);
-        return domainNodes;
-
-    } */
 
     public void ParseProblem(string ctxt) 
     {        
@@ -125,8 +103,6 @@ public class JSONParser
 
     private void GetNodeTreeFromKey(JsonNode node, string key) {
 
-        //TODO - Need a Factory method here
-
         switch (key) {
             case Config.Constants.JSON_NODELABEL_TYPES:
                 types = new List<HSPType>( typeParser.ParseNode(node) );
@@ -149,21 +125,6 @@ public class JSONParser
         }
 
     }
-
-    private void ParseJsonNode(JsonNode node) {
-
-    }
-
-    private void setDomainTypes()
-    {
-
-    }
-
-    private void setDomainPredicates()
-    {
-
-    }
-
 
 }
 

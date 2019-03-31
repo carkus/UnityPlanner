@@ -63,10 +63,6 @@ public class HSPPredicate {
                 HSPTerm _const = arg.constant(value);
                 args.Add(_const);
             }
-            //Not sure why this was required...
-            /*else {
-                args.Add(arg);
-            }*/
         }
         return new HSPPredicate(_name, args);
     }
