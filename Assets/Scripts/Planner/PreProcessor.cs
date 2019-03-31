@@ -46,73 +46,60 @@ namespace Planner
 
             List<HSPAction> actions = new List<HSPAction>();
 
-            for (var a=0; a<_operations.Count; a++) {
+            foreach (HSPOperator _operator in _operations) {
 
                 List<string> variables = new List<string>();
-                variables = DeriveVariables(_operations[a]);
+                variables = DeriveVariables(_operator);
 
                 List<HashSet<string>> objects = new List<HashSet<string>>();
-                objects = DeriveObjects(_operations[a], _objects);
+                objects = DeriveObjects(_operator, _objects);
 
                 //TODO there's got to be a better way, for variable lengths.
                 //But need Tuple to allow for identical values???
-                List<Tuple<string, string, string>> product = new List<Tuple<string, string, string>>();
-                if (objects.Count == 2) {
-                    product = Product_3(objects[0], objects[1], null);
-                    product.Remove(null);
-                }
-
-                if (objects.Count == 3) {
-                    product = Product_3(objects[0], objects[1], objects[2]);
-                }
+                List<List<string>> product = new List<List<string>>();
+                product = CartesianProduct(objects);
 
                 foreach (var prod in product) {
 
                     Dictionary<string, string> subst = new Dictionary<string, string>();
 
-                    //Replaces Zip...
+                    //'Replaces' Zip...
                     for (var i=0; i<variables.Count; i++) {
                         subst.Add(variables[i], prod[i]);
-                        //subst = dict(zip(variables, prod))
                     }
 
                     bool valid = true;
 
-                    for (var j=0; j<_operations[a]._preconditions.Count; j++) {
+                    foreach (HSPLiteral _precondition in _operator._preconditions)
+                    {
+                        
+                        if (_precondition.isNegative()) {
 
-                        HSPLiteral pre = _operations[a]._preconditions[j];
+                            HSPPredicate predicate = _precondition._predicate;
 
+                            string lhs = subst[predicate._args[0]._name];
+                            string rhs = subst[predicate._args[1]._name];
 
-                        if (pre.isNegative()) {
-
-                            HSPPredicate predicate = pre._predicate;
-
-                            //string lhs = subst[predicate._args[0]._name];
-                            //string rhs = subst[predicate._args[1]._name];
-
-                            Debug.Log(subst[predicate._args[0]._name] + " : " + pre.isNegative());
-
-                        }
-
-                        if (valid) {
-
-                            //HSPAction action = ConvertOperatorIntoAction(_operations[a], subst);
+                            if (lhs == rhs) {
+                                valid = false;
+                                break;
+                            }
 
                         }
-
-
 
                     }
 
-                }
+                    if (valid) {
+                        HSPAction action = ConvertOperatorIntoAction(_operator, subst);
+                        actions.Add(action);
+                    }
 
+                }
             }
-            
 
             return actions;
+
         }
-
-
 
         /*''' Given a mapping from variable to constants `subst`return a ground action. '''
         args = [ str(subst.get(param.name, param)) for param in operator._params ]
@@ -127,21 +114,40 @@ namespace Planner
                 neg_effect.add(str(ground_predicate))
         return Action(operator._name, args, precond, pos_effect, neg_effect)*/
 
-        private HSPAction ConvertOperatorIntoAction(HSPOperator _operator, Dictionary<string, List<string>> _subst) {
+        private HSPAction ConvertOperatorIntoAction(HSPOperator _operator, Dictionary<string, string> _subst) {
 
             List<string> args = new List<string>();
 
-            HashSet<string> posEffect = new HashSet<string>();
-            HashSet<string> negEffect = new HashSet<string>();
+            List<HSPPredicate> preconditions = new List<HSPPredicate>();
+            List<string> posEffects = new List<string>();
+            List<string> negEffects = new List<string>();
 
-            foreach (var effect in _operator._effects) {
+            foreach(HSPTerm param in _operator._params) {
+                string arg = _subst[param._name];
+                args.Add(arg);
+            }
 
+            foreach(HSPLiteral _precondition in _operator._preconditions) {
+                if (_precondition.isPositive()) {
+                    HSPPredicate ground = _precondition._predicate.Ground(_subst);
+                    preconditions.Add(ground);
+                }
+            }
 
+            foreach (HSPLiteral effect in _operator._effects) {
+
+                HSPPredicate ground = effect._predicate.Ground(_subst);
+
+                if (effect.isPositive()) {
+                    posEffects.Add(ground.GetString());
+                }
+                else if (effect.isNegative()) {
+                    negEffects.Add(ground.GetString());
+                }
 
             }
 
-
-            return new HSPAction();
+            return new HSPAction(_operator._name, args, preconditions, posEffects, negEffects);
         }
 
 
@@ -200,30 +206,31 @@ namespace Planner
 
             List<Tuple<string, string>> result = new List<Tuple<string, string>>();
 
-            foreach(var t1 in a)
+            foreach(var o1 in a)
             {
-                foreach(var t2 in b) {
-                    result.Add(Tuple.Create<string, string>(t1, t2));
+                foreach(var o2 in b) {
+                    result.Add(Tuple.Create<string, string>(o1, o2));
                 }
             }
 
             return result;
         }*/
 
-        public static List<Tuple<string, string, string>> Product_3(HashSet<string> a, HashSet<string> b, HashSet<string> c) {
+        public static List<List<string>> CartesianProduct(List<HashSet<string>> objects) {
 
-            List<Tuple<string, string, string>> result = new List<Tuple<string, string, string>>();
+            List<List<string>> result = new List<List<string>>();
 
-            foreach(var t1 in a)
+            foreach(var o1 in objects[0])
             {
-                foreach(var t2 in b) 
+                foreach(var o2 in objects[1]) 
                 {
-                    if (c != null) {
-                        foreach(var t3 in c)
-                            result.Add(Tuple.Create<string, string, string>(t1, t2, t3));
+                    if (objects.Count == 3) {
+                        foreach(var o3 in objects[2]) {
+                            result.Add(new List<string>(new string[] { o1, o2, o3 }));
+                        }
                     }
                     else {
-                        result.Add(Tuple.Create<string, string, string>(t1, t2, null));
+                        result.Add(new List<string>(new string[] { o1, o2 }));
                     }
                 }
             }

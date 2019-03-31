@@ -9,18 +9,28 @@
     "predicates": [
         {
             "robot-at": {
-                "room": {}
+                "x": {
+                    "room": {}
+                }
             },
             "box-at": {
-                "box": {
+                "x": {
+                    "box": {}
+                },
+                "y": {
                     "room": {}
                 }
             },
             "free": {
-                "arm": {}
+                "x": {
+                    "arm": {}
+                }
             },
             "carry": {
-                "box": {
+                "x": {
+                    "box": {}
+                },
+                "y": {
                     "arm": {}
                 }
             }

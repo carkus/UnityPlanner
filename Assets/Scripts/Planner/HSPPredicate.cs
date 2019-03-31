@@ -19,12 +19,15 @@ public class HSPPredicate {
         set;
     }
 
+    public HSPPredicate (string name, List<HSPTerm> args) {
+        _args = args;
+        _name = name;
+    }
+
     public HSPPredicate (string name, IDictionary<string, JsonNode> args) {
-        
         _args = new List<HSPTerm>();
         _args = DeriveArgs(args);
         _name = name;
-
     }
 
     public List<HSPTerm> DeriveArgs(IDictionary<string, JsonNode> nodes) {
@@ -52,27 +55,40 @@ public class HSPPredicate {
         return true;
     }
             
-    public int Ground(Dictionary<string, List<string>> subst) {
-
-        /*
-        args = []
-        for arg in self._args:
-            if arg in subst:
-                value = subst[arg]
-                arg = Term.constant(value)
-            args.append(arg)
-        return Predicate(self._name, args)
-         */
-
+    public HSPPredicate Ground(Dictionary<string, string> subst) {
         List<HSPTerm> args = new List<HSPTerm>();
-        foreach(var arg in _args) {
-            //if (subst[arg] != null) {
+        foreach(HSPTerm arg in _args) {
+            if (subst.ContainsKey(arg._name)) {
+                string value = subst[arg._name];//.why not just OO _value??
+                HSPTerm _const = arg.constant(value);
+                args.Add(_const);
+            }
+            //Not sure why this was required...
+            /*else {
+                args.Add(arg);
+            }*/
+        }
+        return new HSPPredicate(_name, args);
+    }
 
-            //}
+    public string GetString() {
+        
+        if (_name.Equals('=')) {
+            return _args[0]._name + " = " + _args[1]._name;
+        }
+        else if (Arity() == 0) {
+            return _name;
+        }
+        else {
+            string sep = ", ";
+            string[] val = new string[_args.Count];
+            for (var i=0; i< _args.Count; i++) {
+                val[i] = _args[i]._value;
+            }
+            return _name + "(" + String.Join( sep, val, 0, Arity() ) + ")";
         }
 
-        return _args.Count;
-    }    
+    }
 
     public int Arity() {
         return _args.Count;

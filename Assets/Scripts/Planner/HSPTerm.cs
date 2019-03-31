@@ -10,8 +10,7 @@ public class HSPTerm {
 
     public string _name { get; set; }
     public string _type { get; set; }
-
-    private string _value;
+    public string _value { get; set; }
 
     public HSPTerm (string name, string type, string value) {
         _name = name;
@@ -19,7 +18,7 @@ public class HSPTerm {
         _value = value;
     }    
 
-    public HSPTerm constant() {
+    public HSPTerm constant(string _value, string type = null) {
         return new HSPTerm(_name, _type, _value);
     }
 
