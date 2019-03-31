@@ -50,15 +50,18 @@
                 "precondition": {
                     "robot-at": {
                         "x": {}
+                    },
+                    "*not": {
+                        "=" : {}
                     }
                 },
                 "effect": {
-                    "posit": {
+                    "positive": {
                         "robot-at": {
                             "y": {}
                         }
                     },
-                    "negate": {
+                    "negative": {
                         "robot-at": {
                             "x": {}
                         }
@@ -90,13 +93,13 @@
                     }
                 },
                 "effect": {
-                    "posit": {
+                    "positive": {
                         "carry": {
                             "X": {},
                             "y": {}
                         }
                     },
-                    "negate": {
+                    "negative": {
                         "box-at": {
                             "x": {},
                             "z": {}
@@ -129,7 +132,7 @@
                     }
                 },
                 "effect": {
-                    "posit": {
+                    "positive": {
                         "box-at": {
                             "x": {},
                             "z": {}
@@ -138,7 +141,7 @@
                             "y": {}
                         }
                     },
-                    "negate": {
+                    "negative": {
                         "carry": {
                             "X": {},
                             "y": {}

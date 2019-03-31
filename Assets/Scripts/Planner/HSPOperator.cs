@@ -50,8 +50,14 @@ public class HSPOperator
         foreach (var obj in node.Members)
         {
             HSPPredicate predicate = new HSPPredicate(obj.Key, obj.Value.Members);
-            HSPLiteral item = new HSPLiteral(predicate, true);
-            items.Add(item);
+            if (obj.Key == "*not") {
+                HSPLiteral item = new HSPLiteral(predicate, false);
+                items.Add(item);
+            }
+            else {
+                HSPLiteral item = new HSPLiteral(predicate, true);
+                items.Add(item);
+            }
         }
 
         return items;
@@ -70,12 +76,12 @@ public class HSPOperator
                 HSPPredicate predicate = new HSPPredicate(obj.Key, obj.Value.Members);
                 HSPLiteral item;
 
-                if (type.Key == "posit")
+                if (type.Key == "positive")
                 {
                     item = new HSPLiteral(predicate, true);
                     items.Add(item);
                 }
-                else if (type.Key == "negate")
+                else if (type.Key == "negative")
                 {
                     item = new HSPLiteral(predicate, false);
                     items.Add(item);

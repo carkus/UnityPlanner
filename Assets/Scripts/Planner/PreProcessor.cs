@@ -75,10 +75,8 @@ namespace Planner
                         
                         if (_precondition.isNegative()) {
 
-                            HSPPredicate predicate = _precondition._predicate;
-
-                            string lhs = subst[predicate._args[0]._name];
-                            string rhs = subst[predicate._args[1]._name];
+                            string lhs = prod[0];
+                            string rhs = prod[1];
 
                             if (lhs == rhs) {
                                 valid = false;
