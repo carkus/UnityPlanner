@@ -29,12 +29,30 @@ public class StateParser : IParser<HSPPredicate>
         List<HSPPredicate> list = new List<HSPPredicate>();
 
         foreach (var obj in node.Members) {
-            HSPPredicate predicate = new HSPPredicate(obj.Key, obj.Value.Members);
+            List<HSPTerm> args = DeriveArgs(obj.Value.Members);
+            HSPPredicate predicate = new HSPPredicate(obj.Key, args);
             list.Add(predicate);
         }
 
         return list;
 
     }   
+
+    public List<HSPTerm> DeriveArgs(IDictionary<string, JsonNode> nodes) {
+        List<HSPTerm> args = new List<HSPTerm>();
+        foreach (var item in nodes) {
+            if (item.Value.Members.Count > 0) {
+                foreach (var member in item.Value.Members) {
+                    HSPTerm newarg = new HSPTerm(null, member.Key, item.Key);
+                    args.Add(newarg);
+                }
+            }
+            else {
+                HSPTerm newarg = new HSPTerm(null, null, item.Key);
+                args.Add(newarg);                
+            }
+        }
+        return args;
+    }     
 
 }

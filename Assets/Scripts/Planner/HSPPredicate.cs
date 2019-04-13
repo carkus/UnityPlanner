@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using JsonToDataContract;
 
-public class HSPPredicate {
+public class HSPPredicate : IComparable<HSPPredicate> {
 
     public string _name
     {
@@ -24,28 +24,40 @@ public class HSPPredicate {
         _name = name;
     }
 
-    public HSPPredicate (string name, IDictionary<string, JsonNode> args) {
-        _args = new List<HSPTerm>();
-        _args = DeriveArgs(args);
-        _name = name;
+    public int CompareTo(HSPPredicate other) {
+        if (this._name == other._name) {
+            return 1;
+        }
+        return 0;
     }
 
-    public List<HSPTerm> DeriveArgs(IDictionary<string, JsonNode> nodes) {
-        List<HSPTerm> args = new List<HSPTerm>();
-        foreach (var item in nodes) {
-            if (item.Value.Members.Count > 0) {
-                foreach (var member in item.Value.Members) {
-                    HSPTerm newarg = new HSPTerm(item.Key, member.Key, null);
-                    args.Add(newarg);
-                }
-            }
-            else {
-                HSPTerm newarg = new HSPTerm(item.Key, null, null);
-                args.Add(newarg);                
+    public bool isApplicableTo(HSPPredicate other) {
+        
+        if (this._name != other._name) {
+            return false;
+        }
+
+        List<string> thisArgs = new List<string>();
+        HashSet<string> otherArgs = new HashSet<string>();
+
+        for(int i=0; i<this._args.Count; i++) {
+            thisArgs.Add(this._args[i]._value);
+        }
+
+        for(int i=0; i<other._args.Count; i++) {
+            otherArgs.Add(other._args[i]._value);
+        }
+
+        bool found = false;
+        for(int i=0; i<thisArgs.Count; i++) {
+            if (otherArgs.Contains(thisArgs[i])) {
+                found = true;
             }
         }
-        return args;
-    }    
+        if (!found) return false;
+        
+        return true;
+    }
 
     public bool IsGrounded() {
         for (int i = 0; i < _args.Count; i++) {

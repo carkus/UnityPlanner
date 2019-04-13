@@ -1,11 +1,27 @@
+
+using System;
 using System.Collections;
+using System.Collections.Generic;
+
 
 public class HSPState {
 
-    public HSPState () {
+    
+    //HashSet<string> self; //hash of string/HSPTerms??
+
+    public List<HSPPredicate> predicates { get; set; }
+
+
+    public HSPState (List<HSPPredicate> _state) {
+
+        predicates = _state;
+
+
+        //self = new HashSet<string>();
 
     }
     
+    private void ground() {}//?? an idea - need?
     
     /*
     '''

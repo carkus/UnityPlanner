@@ -57,14 +57,14 @@ public class JSONParser
         goalStateParser = StateParser.Instance;
     }
 
-    public void ParseDomain(string ctxt) 
+    public void parseDomain(string ctxt) 
     {        
         domainNodes = new List<JsonNode>();
         domainNodes.Clear();
         domainNodes = ParseJSONFilename(ctxt);
     } 
 
-    public void ParseProblem(string ctxt) 
+    public void parseProblem(string ctxt) 
     {        
         problemNodes = new List<JsonNode>();
         problemNodes.Clear();

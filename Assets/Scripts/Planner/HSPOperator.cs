@@ -49,7 +49,8 @@ public class HSPOperator
 
         foreach (var obj in node.Members)
         {
-            HSPPredicate predicate = new HSPPredicate(obj.Key, obj.Value.Members);
+            List<HSPTerm> args = DeriveArgs(obj.Value.Members);
+            HSPPredicate predicate = new HSPPredicate(obj.Key, args);
             if (obj.Key == "*not") {
                 HSPLiteral item = new HSPLiteral(predicate, false);
                 items.Add(item);
@@ -73,7 +74,8 @@ public class HSPOperator
         {
             foreach (var obj in type.Value.Members)
             {
-                HSPPredicate predicate = new HSPPredicate(obj.Key, obj.Value.Members);
+                List<HSPTerm> args = DeriveArgs(obj.Value.Members);
+                HSPPredicate predicate = new HSPPredicate(obj.Key, args);
                 HSPLiteral item;
 
                 if (type.Key == "positive")
@@ -93,5 +95,22 @@ public class HSPOperator
         return items;
 
     }
+
+    public List<HSPTerm> DeriveArgs(IDictionary<string, JsonNode> nodes) {
+        List<HSPTerm> args = new List<HSPTerm>();
+        foreach (var item in nodes) {
+            if (item.Value.Members.Count > 0) {
+                foreach (var member in item.Value.Members) {
+                    HSPTerm newarg = new HSPTerm(item.Key, member.Key, null);
+                    args.Add(newarg);
+                }
+            }
+            else {
+                HSPTerm newarg = new HSPTerm(item.Key, null, null);
+                args.Add(newarg);                
+            }
+        }
+        return args;
+    }       
 
 }

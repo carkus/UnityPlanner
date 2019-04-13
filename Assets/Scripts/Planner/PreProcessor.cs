@@ -31,8 +31,8 @@ namespace Planner
             }
         }
 
-        //public void GroundActions (HSPOperator[] _operators, OBase[] _objects) {
-        public List<HSPAction> GroundActions(List<HSPOperator> _operations, List<HSPPredicate> _objects)
+        //public void groundActions (HSPOperator[] _operators, OBase[] _objects) {
+        public List<HSPAction> groundActions(List<HSPOperator> _operations, List<HSPPredicate> _objects)
         {
 
             List<HSPAction> actions = new List<HSPAction>();

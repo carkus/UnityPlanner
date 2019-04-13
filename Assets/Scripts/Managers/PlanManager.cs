@@ -22,41 +22,45 @@ public class PlanManager
     List<HSPAction> _actions  { get; set;}
 
     PreProcessor _processor;
+    ProgressionPlanner _planner;
 
     public PlanManager () {
+    }
+
+    public void groundProblem() {
         
         string d = "./Assets/PDDL/robot.json";
-        ParseDomain(d);
+        parseDomain(d);
 
         string p = "./Assets/PDDL/robot-3.json";
-        ParseProblem(p);
+        parseProblem(p);
 
         //Construct actions from operators with respect to problem objects:
-        _actions = GroundActions();
+        _actions = groundActions();
+
     }
 
-    public void ParseDomain(string ctxt)
-    {
+    public void parseDomain(string ctxt) {
         _domain = new JSONParser();
-        _domain.ParseDomain(ctxt);
+        _domain.parseDomain(ctxt);
     }
 
 
-    public void ParseProblem(string ctxt)
-    {
-        
+    public void parseProblem(string ctxt) {
         _problem = new JSONParser();
-        _problem.ParseProblem(ctxt);
-        
+        _problem.parseProblem(ctxt);        
     }    
 
-    public List<HSPAction> GroundActions() {
+    public void callPlanner() {
+        _planner = ProgressionPlanner.Instance;
+        _planner.buildPlan(_problem.state, _problem.goal, _actions);
+    }
 
+    public List<HSPAction> groundActions() {
         List<HSPAction> actions = new List<HSPAction>();
         _processor = PreProcessor.Instance;
-        actions = _processor.GroundActions(_domain.operations, _problem.objects);
+        actions = _processor.groundActions(_domain.operations, _problem.objects);
         return actions;
-
     }
     
 }

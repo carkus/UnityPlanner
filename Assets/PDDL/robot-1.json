@@ -1,0 +1,41 @@
+{
+    "objects": [
+        {
+            "room": {
+                "room1": {}
+            },
+            "box": {
+                "box1": {}                
+            },
+            "arm": {
+                "left": {},
+                "right": {}            
+            }
+        }
+    ],
+    "init": [
+        {
+            "robot-at": {
+                "room1": {}
+            },
+            "box-at": {
+                "box1": {
+                    "room1": {}
+                }
+            },
+            "free": {
+                "left": {},
+                "right": {}                
+            }
+        }
+    ],
+    "goal": [
+        {
+            "box-at": {
+                "box1": {
+                    "room1": {}
+                }
+            }
+        }
+    ]
+}

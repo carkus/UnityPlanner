@@ -31,6 +31,8 @@ public class main : MonoBehaviour
     {        
 
         planManager = new PlanManager();
+        planManager.groundProblem();
+        planManager.callPlanner();
         
         worldManager = new WorldManager();
         worldManager.startWorld();

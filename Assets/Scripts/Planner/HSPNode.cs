@@ -1,14 +1,24 @@
-using System.Collections;
 
-public class HSPNode {
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+public class HSPNode : IComparable<HSPNode> {
 
     private HSPState _state;
-    private HSPAction _action;
+    private HSPAction _action ;
     private HSPNode _parent;
     private int _f;
 
     public int _g { get; set; }
     public int _h { get; set; }
+
+    public int CompareTo(HSPNode other) {
+        if (this._f < other._f) {
+            return 1;
+        }
+        return 0;
+    }
 
     public HSPNode (HSPState state, HSPAction action, HSPNode parent = null, int g = 0, int h = 0) {
 
@@ -19,6 +29,24 @@ public class HSPNode {
         _h = h;
         _f = 0;
 
+    }
+
+    public HSPState getState() {
+        return _state;
+    }
+
+    public List<HSPNode> getPath() {
+        
+        List<HSPNode> path = new List<HSPNode>();
+        HSPNode node = this;//new HSPNode();
+        //node = this;
+
+        while (node._parent != null) {
+            path.Add(node);
+            node = node._parent;
+        }
+        
+        return path;
     }
 
     /*def __lt__(self, other):
