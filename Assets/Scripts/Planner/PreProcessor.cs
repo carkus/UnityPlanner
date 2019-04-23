@@ -102,30 +102,34 @@ namespace Planner
             List<string> args = new List<string>();
 
             List<HSPPredicate> preconditions = new List<HSPPredicate>();
-            List<string> posEffects = new List<string>();
-            List<string> negEffects = new List<string>();
+            List<HSPPredicate> posEffects = new List<HSPPredicate>();
+            List<HSPPredicate> negEffects = new List<HSPPredicate>();
 
             foreach(HSPTerm param in _operator._params) {
-                string arg = _subst[param._name];
+                string arg = _subst[param.GetName()];
                 args.Add(arg);
             }
 
             foreach(HSPLiteral _precondition in _operator._preconditions) {
-                if (_precondition.isPositive()) {
-                    HSPPredicate ground = _precondition._predicate.Ground(_subst);
+                bool positive = _precondition.isPositive();
+                if (positive) {
+                    HSPPredicate ground = _precondition._predicate.GroundToConstant(_subst);
                     preconditions.Add(ground);
                 }
             }
 
             foreach (HSPLiteral effect in _operator._effects) {
 
-                HSPPredicate ground = effect._predicate.Ground(_subst);
+                //Ground converts variable to constant for each operation effect
+                HSPPredicate ground = effect._predicate.GroundToConstant(_subst);
 
                 if (effect.isPositive()) {
-                    posEffects.Add(ground.GetString());
+                    //posEffects.Add(ground.GetString());
+                    posEffects.Add(ground);
                 }
                 else if (effect.isNegative()) {
-                    negEffects.Add(ground.GetString());
+                    //negEffects.Add(ground.GetString());
+                    negEffects.Add(ground);
                 }
 
             }
@@ -139,7 +143,7 @@ namespace Planner
             List<string> list = new List<string>();
 
             for (var j=0; j<_op._params.Count; j++) {
-                list.Add(_op._params[j]._name);
+                list.Add(_op._params[j].GetName());
             }
 
             return list;
@@ -150,14 +154,21 @@ namespace Planner
             List<HashSet<string>> list = new List<HashSet<string>>();
 
             for (var i=0; i<_op._params.Count; i++) {
-                string type = _op._params[i]._type;
+                
+                string type = _op._params[i].GetTermType();
+
                 for (var j=0; j<_objects.Count; j++) {
-                    if (_objects[j]._name == type) {
+                    if (_objects[j].GetName() == type) {
+
                         HashSet<string> group = new HashSet<string>();
-                        for (var k=0; k<_objects[j]._args.Count; k++) {
-                            group.Add(_objects[j]._args[k]._name);
+                        List<HSPTerm> _args = _objects[j].GetArgs();
+
+                        for (var k=0; k<_args.Count; k++) {
+                            group.Add(_args[k].GetName());
                         }
+
                         list.Add(group);
+
                     }
                 }
             }

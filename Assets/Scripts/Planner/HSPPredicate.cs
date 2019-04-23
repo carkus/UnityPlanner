@@ -8,16 +8,9 @@ using JsonToDataContract;
 
 public class HSPPredicate : IComparable<HSPPredicate> {
 
-    public string _name
-    {
-        get ;
-        set ;
-    }
+    private string _name;
+    private List<HSPTerm> _args;
 
-    public List<HSPTerm> _args { 
-        get; 
-        set;
-    }
 
     public HSPPredicate (string name, List<HSPTerm> args) {
         _args = args;
@@ -31,7 +24,8 @@ public class HSPPredicate : IComparable<HSPPredicate> {
         return 0;
     }
 
-    public bool isApplicableTo(HSPPredicate other) {
+    //Removed to use HashSet implementation
+    /*public bool isApplicableTo(HSPPredicate other) {
         
         if (this._name != other._name) {
             return false;
@@ -41,11 +35,11 @@ public class HSPPredicate : IComparable<HSPPredicate> {
         HashSet<string> otherArgs = new HashSet<string>();
 
         for(int i=0; i<this._args.Count; i++) {
-            thisArgs.Add(this._args[i]._value);
+            thisArgs.Add(this._args[i].GetValue());
         }
 
         for(int i=0; i<other._args.Count; i++) {
-            otherArgs.Add(other._args[i]._value);
+            otherArgs.Add(other._args[i].GetValue());
         }
 
         bool found = false;
@@ -57,7 +51,7 @@ public class HSPPredicate : IComparable<HSPPredicate> {
         if (!found) return false;
         
         return true;
-    }
+    }*/
 
     public bool IsGrounded() {
         for (int i = 0; i < _args.Count; i++) {
@@ -67,13 +61,25 @@ public class HSPPredicate : IComparable<HSPPredicate> {
         return true;
     }
             
-    public HSPPredicate Ground(Dictionary<string, string> subst) {
+    public HSPPredicate GroundToConstant(Dictionary<string, string> subst) {
+
         List<HSPTerm> args = new List<HSPTerm>();
         foreach(HSPTerm arg in _args) {
-            if (subst.ContainsKey(arg._name)) {
-                string value = subst[arg._name];//.why not just OO _value??
-                HSPTerm _const = arg.constant(value);
-                args.Add(_const);
+            
+            if (subst.ContainsKey(arg.GetValue())) {
+            
+                string value = subst[arg.GetValue()];
+
+                if (arg.IsTyped()) {
+                    string type = subst[arg.GetTermType()];
+                    HSPTerm _const = arg.constant(type, value);
+                    args.Add(_const);
+                }
+                else {
+                    HSPTerm _const = arg.constant(null, value);
+                    args.Add(_const);
+                }
+
             }
         }
         return new HSPPredicate(_name, args);
@@ -82,7 +88,7 @@ public class HSPPredicate : IComparable<HSPPredicate> {
     public string GetString() {
         
         if (_name.Equals('=')) {
-            return _args[0]._name + " = " + _args[1]._name;
+            return _args[0].GetName() + " = " + _args[1].GetName();
         }
         else if (Arity() == 0) {
             return _name;
@@ -91,7 +97,7 @@ public class HSPPredicate : IComparable<HSPPredicate> {
             string sep = ", ";
             string[] val = new string[_args.Count];
             for (var i=0; i< _args.Count; i++) {
-                val[i] = _args[i]._value;
+                val[i] = _args[i].GetValue();
             }
             return _name + "(" + String.Join( sep, val, 0, Arity() ) + ")";
         }
@@ -101,6 +107,15 @@ public class HSPPredicate : IComparable<HSPPredicate> {
     public int Arity() {
         return _args.Count;
     }
+
+    public string GetName() {
+        return _name;
+    }      
+
+    public List<HSPTerm> GetArgs() {
+        return _args;
+    }  
+
 
 
 }

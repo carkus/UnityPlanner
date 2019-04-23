@@ -47,13 +47,37 @@ namespace Planner
 
         }
 
-        public void solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
+        private HashSet<string> GroundPredicatesToState(List<HSPPredicate> predicates) {
+            HashSet<string> grounds = new HashSet<string>();
+
+            string getGroundString(HSPPredicate predicate, HSPTerm arg) {
+                if (arg.IsTyped()) {
+                    return $"{predicate.GetName()}({arg.GetValue()}, {arg.GetTermType()})"; 
+                }
+                return $"{predicate.GetName()}({arg.GetValue()})";        
+            }
+
+            foreach(HSPPredicate pred in predicates) {
+                foreach(HSPTerm arg in pred.GetArgs()) {
+                    grounds.Add(getGroundString(pred, arg));
+                }
+            }
+
+            return grounds;
+        }
+            
+
+        public List<HSPNode> solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
         {
 
             HashSet<HSPState> explored = new HashSet<HSPState>();
-            Dictionary<HSPState, HSPNode> g_cost = new Dictionary<HSPState, HSPNode>();
+            HashSet<HSPNode> prioritised = new HashSet<HSPNode>();
 
-            HSPState init = new HSPState(initState);
+            Dictionary<HSPState, int> g_cost = new Dictionary<HSPState, int>();
+
+            HSPState init = new HSPState(GroundPredicatesToState(_state));
+            HSPState goal = new HSPState(GroundPredicatesToState(_goal));
+
             HSPNode start = new HSPNode(init, null, null, 0, 1);
 
             frontierQ.Enqueue(start);
@@ -65,63 +89,69 @@ namespace Planner
 
                 explored.Add(state);
 
-                if (isGoal(state)) {}
-
+                if (ArrivedAtGoal(goal, state)) {
+                    List<HSPNode> plan = node.getPath();
+                    return plan;
+                }
 
                 List<HSPAction> applicables = getApplicables(state);
 
                 foreach(HSPAction action in applicables) {
 
-                    Debug.Log(action);
+                    HashSet<string> negEffects = GroundPredicatesToState(action._negEffects);
+                    HashSet<string> posEffects = GroundPredicatesToState(action._posEffects);
 
+                    HSPState new_state = state.applyAction(negEffects, posEffects);
 
-                    
-                   
+                    //#if node already explored, don't bother 
+                    bool repeatExplore = explored.Contains(new_state);
+
+                    if (!repeatExplore) {
+                        int cost = _W;
+                        
+                        HSPNode new_node = new HSPNode(new_state, action, node, node.GetG() + 1, cost);
+
+                        bool repeatEnqueue = prioritised.Contains(new_node);
+
+                        if (!repeatEnqueue || new_node.GetG() < g_cost[new_state]) {
+                            g_cost[new_state] = new_node.GetG();
+                            frontierQ.Enqueue(new_node);
+                            prioritised.Add(new_node);
+                        }
+
+                    }
+
                 }
 
             }
+
+            return null;
 
         }
 
         private List<HSPAction> getApplicables(HSPState state) {
-
             List<HSPAction> applicables = new List<HSPAction>();
-
+            HashSet<string> groundedState = state.GroundedState();
             //i.e. the actions may be performed in state
             //e.g. if a.precond <= state:
             //check if preconditions of action are subset of state
             foreach(HSPAction action in groundedActions) {
-
-                int sated = 0;
-
-                foreach(HSPPredicate precondition in action._preconditions) {   
-
-                    bool found = false;
-
-                    foreach(HSPPredicate predicate in state.predicates) {
-                        found = precondition.isApplicableTo(predicate);
-                        if (found) break;
-                    }
-
-                    if (found) sated++;
-
+                HashSet<string> precons = GroundPredicatesToState(action._preconditions);
+                if (precons.IsSubsetOf(groundedState)) {
+                    applicables.Add(action);
                 }
-
-                if (sated == action._preconditions.Count) applicables.Add(action);
-            
             }
-
             return applicables;
         }
 
-        private bool isGoal(HSPState _state) {
-            //Return true if `state` is a goal state. '''
-            return false;//goal <= state; //Less than.... as in goal is in state...
+        private bool ArrivedAtGoal(HSPState _goal, HSPState _state) {
+            return _state.GroundedState().IsSubsetOf(_goal.GroundedState());
+            //return _goal <= _state;
         }
 
         public int f(HSPNode node)
         {
-            return node._g + node._h;
+            return node.GetG() + node.GetH();
         }
 
         /*def solve(self, W, heuristics, init, goal, actions):

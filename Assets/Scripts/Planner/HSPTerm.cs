@@ -8,17 +8,21 @@ using JsonToDataContract;
 
 public class HSPTerm {
 
-    public string _name { get; set; }
-    public string _type { get; set; }
-    public string _value { get; set; }
+    private string _name;
+    private string _type;
+    private string _value;
 
-    public HSPTerm (string name, string type, string value) {
+    public HSPTerm (string name = null, string type = null, string value = null) {
         _name = name;
         _type = type;
         _value = value;
-    }    
+    }
 
-    public HSPTerm constant(string _value, string type = null) {
+    public bool isEqualTo(HSPTerm other) {
+        return true;
+    }
+
+    public HSPTerm constant(string _type = null, string _value = null) {
         return new HSPTerm(_name, _type, _value);
     }
 
@@ -32,6 +36,18 @@ public class HSPTerm {
 
     public bool IsConstant() {
         return _value != null;
+    }
+
+    public string GetTermType() {
+        return _type;
+    } 
+
+    public string GetName() {
+        return _name;
+    }   
+
+    public string GetValue() {
+        return _value;
     }
 
 }

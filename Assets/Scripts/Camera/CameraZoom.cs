@@ -8,8 +8,9 @@ public class CameraZoom : MonoBehaviour {
 	private int minView = 20;
 
 	private float ySense = 3f;
-	private int maxY = 15;
-	private int minY = 10;	
+	
+	//private int maxY = 15;
+	//private int minY = 10;	
 
 
 	private float smooth = 5.0f;
@@ -26,7 +27,7 @@ public class CameraZoom : MonoBehaviour {
 	public int orthZoomMaxSize = 500;
 	public int orthZoomMinSize = 300;
 	
-	private bool orthographicView = false;
+	//private bool orthographicView = false;
 	private Vector3 dragOrigin;
 
 	/// <summary>

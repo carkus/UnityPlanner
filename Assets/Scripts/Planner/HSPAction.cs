@@ -21,12 +21,12 @@ public class HSPAction {
         set;
     }
 
-    public List<string> _posEffects {
+    public List<HSPPredicate> _posEffects {
         get;
         set;
     }
 
-    public List<string> _negEffects {
+    public List<HSPPredicate> _negEffects {
         get;
         set;
     }
@@ -36,8 +36,8 @@ public class HSPAction {
         string name, 
         List<string> args, 
         List<HSPPredicate> preconditions, 
-        List<string> posEffects,
-        List<string> negEffects) 
+        List<HSPPredicate> posEffects,
+        List<HSPPredicate> negEffects) 
         {
 
         _name = name;

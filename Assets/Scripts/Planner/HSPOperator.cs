@@ -49,7 +49,9 @@ public class HSPOperator
 
         foreach (var obj in node.Members)
         {
+            
             List<HSPTerm> args = DeriveArgs(obj.Value.Members);
+
             HSPPredicate predicate = new HSPPredicate(obj.Key, args);
             if (obj.Key == "*not") {
                 HSPLiteral item = new HSPLiteral(predicate, false);
@@ -101,12 +103,15 @@ public class HSPOperator
         foreach (var item in nodes) {
             if (item.Value.Members.Count > 0) {
                 foreach (var member in item.Value.Members) {
-                    HSPTerm newarg = new HSPTerm(item.Key, member.Key, null);
+
+                    //HSPTerm newarg = new HSPTerm(item.Key, member.Key, null);
+                    HSPTerm newarg = new HSPTerm(null, member.Key, item.Key);
+                    
                     args.Add(newarg);
                 }
             }
             else {
-                HSPTerm newarg = new HSPTerm(item.Key, null, null);
+                HSPTerm newarg = new HSPTerm(null, null, item.Key);
                 args.Add(newarg);                
             }
         }

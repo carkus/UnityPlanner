@@ -38,6 +38,51 @@
     ],
     "operations": [
         {
+            "pickup": {
+                "parameters": {
+                    "x": {
+                        "box": {}
+                    },
+                    "y": {
+                        "arm": {}
+                    },
+                    "z": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "box-at": {
+                        "x": {
+                            "z": {}
+                        }                        
+                    },
+                    "free": {
+                        "y": {}
+                    },
+                    "robot-at": {
+                        "z": {}
+                    }
+                },
+                "effect": {
+                    "positive": {
+                        "carry": {
+                            "x": {
+                                "y": {}
+                            }                            
+                        }
+                    },
+                    "negative": {
+                        "box-at": {
+                            "x": {
+                                "z": {}
+                            }                            
+                        },
+                        "free": {
+                            "y": {}
+                        }
+                    }
+                }
+            },
             "move": {
                 "parameters": {
                     "x": {
@@ -68,48 +113,6 @@
                     }
                 }
             },
-            "pickup": {
-                "parameters": {
-                    "x": {
-                        "box": {}
-                    },
-                    "y": {
-                        "arm": {}
-                    },
-                    "z": {
-                        "room": {}
-                    }
-                },
-                "precondition": {
-                    "free": {
-                        "y": {}
-                    },
-                    "robot-at": {
-                        "z": {}
-                    },
-                    "box-at": {
-                        "x": {},
-                        "z": {}
-                    }
-                },
-                "effect": {
-                    "positive": {
-                        "carry": {
-                            "X": {},
-                            "y": {}
-                        }
-                    },
-                    "negative": {
-                        "box-at": {
-                            "x": {},
-                            "z": {}
-                        },
-                        "free": {
-                            "y": {}
-                        }
-                    }
-                }
-            },
             "putdown": {
                 "parameters": {
                     "x": {
@@ -124,8 +127,9 @@
                 },
                 "precondition": {
                     "carry": {
-                        "x": {},
-                        "y": {}
+                        "x": {
+                            "y": {}
+                        }       
                     },
                     "robot-at": {
                         "z": {}
@@ -134,8 +138,9 @@
                 "effect": {
                     "positive": {
                         "box-at": {
-                            "x": {},
-                            "z": {}
+                            "x": {
+                                "z": {}
+                            }
                         },
                         "free": {
                             "y": {}
@@ -143,8 +148,9 @@
                     },
                     "negative": {
                         "carry": {
-                            "X": {},
-                            "y": {}
+                            "X": {
+                                "y": {}
+                            }
                         }
                     }
                 }

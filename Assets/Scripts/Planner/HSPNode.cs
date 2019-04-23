@@ -8,10 +8,10 @@ public class HSPNode : IComparable<HSPNode> {
     private HSPState _state;
     private HSPAction _action ;
     private HSPNode _parent;
+    
     private int _f;
-
-    public int _g { get; set; }
-    public int _h { get; set; }
+    private int _g;
+    private int _h;
 
     public int CompareTo(HSPNode other) {
         if (this._f < other._f) {
@@ -47,6 +47,18 @@ public class HSPNode : IComparable<HSPNode> {
         }
         
         return path;
+    }
+
+    public int GetF() {
+        return _f;
+    }
+
+    public int GetG() {
+        return _g;
+    }
+
+    public int GetH() {
+        return _h;
     }
 
     /*def __lt__(self, other):
