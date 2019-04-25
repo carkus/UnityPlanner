@@ -4,25 +4,41 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+[Serializable]
+public class HSPState : IComparable<HSPState>, ICloneable {
 
-public class HSPState : IComparable<HSPState> {
+    public HashSet<string> _grounds;
 
-    private HashSet<string> _grounds = new HashSet<string>();
-
-    public HSPState (HashSet<string> state) {
-        _grounds = state;
+    public HSPState (HashSet<string> grounds) {
+        _grounds = new HashSet<string>();
+        _grounds = grounds;
     }
 
-    public HSPState applyAction(HashSet<string> negEffects, HashSet<string> posEffects) {
-        HashSet<string> new_state = new HashSet<string>();
-        new_state = _grounds;        
-        new_state.ExceptWith(negEffects);
-        new_state.UnionWith(posEffects);
-        return new HSPState(new_state);
+    public void SetGroundedState(HashSet<string> grounds) {
+        _grounds = new HashSet<string>();
+        _grounds = grounds;
     }
 
     public HashSet<string> GroundedState() {
         return _grounds;
+    }
+
+    public object Clone() {
+        HSPState newState = (HSPState) this.MemberwiseClone();
+        HashSet<string> newGrounds = new HashSet<string>();
+        newGrounds = this._grounds;
+        newState._grounds = newGrounds;
+        return (HSPState)newState;
+    }
+
+    public void applyAction(HashSet<string> _negEffects, HashSet<string> _posEffects) {
+        this._grounds.ExceptWith(_negEffects);
+        this._grounds.UnionWith(_posEffects);
+    }    
+
+    public string GetString() {
+        string sep = "_";
+        return "_" + String.Join( sep, _grounds ) + "_";//, 0, _grounds.Count ) + ")";
     }
     
     public int CompareTo(HSPState other) {

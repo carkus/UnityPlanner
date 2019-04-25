@@ -48,4 +48,9 @@ public class HSPAction {
 
     }
 
+    public string GetString() {
+        string sep = ",";
+        return _name + " (" + String.Join( sep, _args ) + ")";
+    }
+
 }

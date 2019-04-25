@@ -1,0 +1,55 @@
+{
+    "objects": [
+        {
+            "room": {
+                "room1": {},
+                "room2": {}
+            },
+            "box": {
+                "box1": {},
+                "box2": {}              
+            },
+            "arm": {
+                "left": {},
+                "right": {}       
+            }
+        }
+    ],
+    "init": [
+        {
+            "robot-at": {
+                "room1": {}
+            },
+            "box-at": {
+                "box1": {
+                    "room1": {}
+                },
+                "box2": {
+                    "room1": {}
+                },
+                "box3": {
+                    "room1": {}
+                }
+            },
+            "free": {
+                "left": {},
+                "right": {}                
+            }
+        }
+    ],
+    "goal": [
+        {
+            "box-at": {
+                "box1": {
+                    "room1": {}
+                },
+                "box2": {
+                    "room2": {}
+                }
+            },
+            "robot-at": {
+                "room1": {}               
+            }
+        }
+    ]
+}

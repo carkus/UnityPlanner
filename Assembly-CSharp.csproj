@@ -91,6 +91,7 @@
      <Compile Include="Assets\Scripts\Player\PlayerHealth.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerShooting.cs" />
+     <Compile Include="Assets\Scripts\Utils\Cloner.cs" />
      <Compile Include="Assets\Scripts\Utils\DataController.cs" />
      <Compile Include="Assets\Scripts\Utils\EnumGenerator.cs" />
      <Compile Include="Assets\Scripts\Utils\JsonNode.cs" />

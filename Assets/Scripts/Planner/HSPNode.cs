@@ -31,9 +31,19 @@ public class HSPNode : IComparable<HSPNode> {
 
     }
 
-    public HSPState getState() {
-        return _state;
+    public HSPState GetState() {
+        return (HSPState)_state.Clone();
     }
+
+    public HSPAction GetAction() {
+        return _action;
+    }
+
+
+    public string GetString() {
+        string sep = "_";
+        return _g + "_" + String.Join( sep, _state.GroundedState() ) + "_";//, 0, _grounds.Count ) + ")";
+    }    
 
     public List<HSPNode> getPath() {
         
