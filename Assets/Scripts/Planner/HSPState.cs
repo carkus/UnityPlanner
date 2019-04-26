@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 [Serializable]
 public class HSPState : IComparable<HSPState>, ICloneable {
@@ -37,8 +38,11 @@ public class HSPState : IComparable<HSPState>, ICloneable {
     }    
 
     public string GetString() {
-        string sep = "_";
-        return "_" + String.Join( sep, _grounds ) + "_";//, 0, _grounds.Count ) + ")";
+        string sep = ", ";
+        string[] output = new string[_grounds.Count];
+        output = _grounds.ToArray();
+        Array.Sort(output);
+        return "( " + String.Join( sep, output ) + " )";//, 0, _grounds.Count ) + ")";
     }
     
     public int CompareTo(HSPState other) {

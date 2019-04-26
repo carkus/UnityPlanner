@@ -38,6 +38,36 @@
     ],
     "operations": [
         {
+            "move": {
+                "parameters": {
+                    "x": {
+                        "room": {}
+                    },
+                    "y": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "robot-at": {
+                        "x": {}
+                    },
+                    "*not": {
+                        "=" : {}
+                    }
+                },
+                "effect": {
+                    "positive": {
+                        "robot-at": {
+                            "y": {}
+                        }
+                    },
+                    "negative": {
+                        "robot-at": {
+                            "x": {}
+                        }
+                    }
+                }
+            },
             "pickup": {
                 "parameters": {
                     "x": {
@@ -79,36 +109,6 @@
                         },
                         "free": {
                             "y": {}
-                        }
-                    }
-                }
-            },
-            "move": {
-                "parameters": {
-                    "x": {
-                        "room": {}
-                    },
-                    "y": {
-                        "room": {}
-                    }
-                },
-                "precondition": {
-                    "robot-at": {
-                        "x": {}
-                    },
-                    "*not": {
-                        "=" : {}
-                    }
-                },
-                "effect": {
-                    "positive": {
-                        "robot-at": {
-                            "y": {}
-                        }
-                    },
-                    "negative": {
-                        "robot-at": {
-                            "x": {}
                         }
                     }
                 }

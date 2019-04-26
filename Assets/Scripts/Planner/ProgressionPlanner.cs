@@ -17,6 +17,7 @@ namespace Planner
         private List<HSPAction> groundedActions;
 
         private PriorityQueue<HSPNode> frontierQ = new PriorityQueue<HSPNode>();
+        private HashSet<string> enQueued = new HashSet<string>();
         
         //Singleton
         private static ProgressionPlanner instance;
@@ -38,20 +39,49 @@ namespace Planner
 
         public void buildPlan(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions) {
 
+            //initState = RemoveRedundanciesFromState(_state, _goal);
+
             initState = _state;
             goalState = _goal;
             groundedActions = _actions;
 
-            List<HSPNode> plan = solve(_state, _goal, _actions, 1, 1);
-            plan.Reverse();
+            //List<HSPNode> plan = new List<HSPNode>();
+            List<List<HSPNode>> planStack = new List<List<HSPNode>>();
+            try
+            {
+                //plan = solve(_state, _goal, _actions, 1, 1);
+                planStack = solve(_state, _goal, _actions, 1, 1);
+            }
+            catch(Exception e)
+            {
+                Debug.Log("Planner failed: " + e);
+            }
+            finally 
+            {
 
-            foreach(HSPNode node in plan) {
-                string act = node.GetAction().GetString();
-                Debug.Log(act);
+                foreach(List<HSPNode> plan in planStack) {
+                    if (plan != null) {
+                        plan.Reverse();
+                        foreach(HSPNode node in plan) {
+                            string act = node.GetAction().GetString();
+                            Debug.Log(act + " : " + node.GetG());
+                        }
+                        Debug.Log("______");
+                    }
+                    else {
+                        Debug.Log("Planner failed.");
+                    }
+                }
+
             }
 
-
         }
+
+        /*private List<HSPPredicate> RemoveRedundanciesFromState(List<HSPPredicate> _state, List<HSPPredicate> _goal) {
+
+        }*/
+
+
 
         private HashSet<string> GroundPredicatesToState(List<HSPPredicate> predicates) {
             HashSet<string> grounds = new HashSet<string>();
@@ -72,72 +102,61 @@ namespace Planner
             return grounds;
         }
 
-        public List<HSPNode> solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
+        public List<List<HSPNode>> solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
         {
+            
+            Debug.Log ("START");
 
             int attempts = 0;
 
+            List<List<HSPNode>> planStack = new List<List<HSPNode>>();
             HashSet<string> explored = new HashSet<string>();
-            HashSet<string> prioritised = new HashSet<string>();
-
             Dictionary<string, int> g_cost = new Dictionary<string, int>();
 
             HSPState init = new HSPState(GroundPredicatesToState(_state));
             HSPState goal = new HSPState(GroundPredicatesToState(_goal));
-            HSPNode start = new HSPNode((HSPState)init.Clone(), null, null, 0, 1);
 
-            frontierQ.Enqueue(start);
-            prioritised.Add(start.GetString());
+            HSPNode start = new HSPNode((HSPState)init.Clone(), null, null, 0, 0);
 
-            while (frontierQ.Count() > 0 && attempts < 10000) {
+            Enqueue(start);
+
+            while (frontierQ.Count() > 0) {
 
                 HSPNode node = frontierQ.Dequeue();
-
-                HSPState state = (HSPState)node.GetState().Clone();//deep copy here on get state?
+                HSPState state = (HSPState)node.GetState().Clone();
 
                 explored.Add(state.GetString());//State or Node?
 
                 if (ArrivedAtGoal(goal, state)) {
                     List<HSPNode> plan = node.getPath();
-                    return plan;
+                    planStack.Add(plan);
+                    //This will return the first plan only.
+                    //Comment out to return multiple plans
+                    return planStack;
                 }
 
                 List<HSPAction> applicables = getApplicables(state);
 
                 foreach(HSPAction action in applicables) {
-
-                    HashSet<string> negEffects = GroundPredicatesToState(action._negEffects);
-                    HashSet<string> posEffects = GroundPredicatesToState(action._posEffects);
-
-                    HashSet<string> newGrounds = new HashSet<string>();
-                    foreach(var item in state.GroundedState()) {
-                        newGrounds.Add(item);
-                    }
-                    newGrounds.ExceptWith(negEffects);
-                    newGrounds.UnionWith(posEffects);
                     
-                    HSPState newState = new HSPState(newGrounds);
+                    HSPState newState = DeriveNewStateFromAction(action, state);
 
                     //#if node already explored, don't bother 
-                    bool repeatExplore = explored.Contains(newState.GetString());
-
-                    if (!repeatExplore) {
-                        int cost = _W;
-                        
-                        HSPNode new_node = new HSPNode((HSPState)newState.Clone(), action, node, node.GetG() + 1, cost);
-
-                        if (!g_cost.ContainsKey(new_node.GetString())) {
-                            g_cost.Add(new_node.GetString(), new_node.GetG());
-                        }
-                        
-                        int old_g = g_cost[new_node.GetString()];
-                        bool repeatEnqueue = prioritised.Contains(new_node.GetString());
-
-                        if (!repeatEnqueue || new_node.GetG() < old_g) {
-                            frontierQ.Enqueue(new_node);
-                            prioritised.Add(new_node.GetString());
-                        }
-
+                    string stateString = newState.GetString();
+                 
+                    if (explored.Contains(stateString)) {
+                        continue;
+                    }
+                       
+                    HSPNode new_node = new HSPNode((HSPState)newState.Clone(), action, node, node.GetG() + 1, 0);
+   
+                    if (!g_cost.ContainsKey(stateString)) {
+                        g_cost.Add(stateString, new_node.GetG());
+                        Enqueue(new_node);
+                    }
+                    
+                    if (!enQueued.Contains(new_node.GetString()) || new_node.GetG() < g_cost[stateString]) {
+                        Enqueue(new_node);
                     }
 
                 }
@@ -146,8 +165,22 @@ namespace Planner
 
             }
 
-            return null;
+            return planStack;
 
+        }
+
+        private HSPState DeriveNewStateFromAction(HSPAction action, HSPState state) {
+            //Derive New State From Action
+            HashSet<string> negEffects = GroundPredicatesToState(action._negEffects);
+            HashSet<string> posEffects = GroundPredicatesToState(action._posEffects);
+
+            HashSet<string> newGrounds = new HashSet<string>();
+            foreach(var item in state.GroundedState()) {
+                newGrounds.Add(item);
+            }
+            newGrounds.ExceptWith(negEffects);
+            newGrounds.UnionWith(posEffects);
+            return new HSPState(newGrounds);
         }
 
         private List<HSPAction> getApplicables(HSPState state) {
@@ -165,14 +198,14 @@ namespace Planner
             return applicables;
         }
 
+        public void Enqueue(HSPNode node) {
+            frontierQ.Enqueue(node);
+            enQueued.Add(node.GetString());
+        }
+
         private bool ArrivedAtGoal(HSPState _goal, HSPState _state) {
             return _goal.GroundedState().IsSubsetOf(_state.GroundedState());
             //return _goal <= _state;
-        }
-
-        public int f(HSPNode node)
-        {
-            return node.GetG() + node.GetH();
         }
 
     }
