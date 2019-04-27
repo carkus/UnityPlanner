@@ -8,21 +8,17 @@ using System.Linq;
 [Serializable]
 public class HSPState : IComparable<HSPState>, ICloneable {
 
-    public HashSet<string> _grounds;
+    private HashSet<string> _grounds;
 
     public HSPState (HashSet<string> grounds) {
         _grounds = new HashSet<string>();
         _grounds = grounds;
     }
 
-    public void SetGroundedState(HashSet<string> grounds) {
-        _grounds = new HashSet<string>();
-        _grounds = grounds;
-    }
-
-    public HashSet<string> GroundedState() {
-        return _grounds;
-    }
+    public void applyAction(HashSet<string> _negEffects, HashSet<string> _posEffects) {
+        this._grounds.ExceptWith(_negEffects);
+        this._grounds.UnionWith(_posEffects);
+    }    
 
     public object Clone() {
         HSPState newState = (HSPState) this.MemberwiseClone();
@@ -32,18 +28,13 @@ public class HSPState : IComparable<HSPState>, ICloneable {
         return (HSPState)newState;
     }
 
-    public void applyAction(HashSet<string> _negEffects, HashSet<string> _posEffects) {
-        this._grounds.ExceptWith(_negEffects);
-        this._grounds.UnionWith(_posEffects);
-    }    
-
-    public string GetString() {
+    public override string ToString() {
         string sep = ", ";
         string[] output = new string[_grounds.Count];
         output = _grounds.ToArray();
         Array.Sort(output);
         return "( " + String.Join( sep, output ) + " )";//, 0, _grounds.Count ) + ")";
-    }
+    }        
     
     public int CompareTo(HSPState other) {
         if (this._grounds.Equals(other._grounds)) {
@@ -82,6 +73,9 @@ public class HSPState : IComparable<HSPState>, ICloneable {
        return operand1.CompareTo(operand2) <= 0;
     }
 
+    public HashSet<string> GroundedState() {
+        return _grounds;
+    }
 
 
 

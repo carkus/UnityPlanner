@@ -3,7 +3,7 @@
         {
             "room": {},
             "arm": {},
-            "box": {}
+            "object": {}
         }
     ],
     "predicates": [
@@ -13,9 +13,9 @@
                     "room": {}
                 }
             },
-            "box-at": {
+            "object-at": {
                 "x": {
-                    "box": {}
+                    "object": {}
                 },
                 "y": {
                     "room": {}
@@ -28,7 +28,7 @@
             },
             "carry": {
                 "x": {
-                    "box": {}
+                    "object": {}
                 },
                 "y": {
                     "arm": {}
@@ -71,7 +71,7 @@
             "pickup": {
                 "parameters": {
                     "x": {
-                        "box": {}
+                        "object": {}
                     },
                     "y": {
                         "arm": {}
@@ -81,7 +81,7 @@
                     }
                 },
                 "precondition": {
-                    "box-at": {
+                    "object-at": {
                         "x": {
                             "z": {}
                         }                        
@@ -102,7 +102,7 @@
                         }
                     },
                     "negative": {
-                        "box-at": {
+                        "object-at": {
                             "x": {
                                 "z": {}
                             }                            
@@ -116,7 +116,7 @@
             "putdown": {
                 "parameters": {
                     "x": {
-                        "box": {}
+                        "object": {}
                     },
                     "y": {
                         "arm": {}
@@ -137,7 +137,7 @@
                 },
                 "effect": {
                     "positive": {
-                        "box-at": {
+                        "object-at": {
                             "x": {
                                 "z": {}
                             }

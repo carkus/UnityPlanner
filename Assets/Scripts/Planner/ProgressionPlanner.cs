@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Utils;
+//using Utils;
 
 namespace Planner
 {
@@ -66,7 +66,6 @@ namespace Planner
                             string act = node.GetAction().GetString();
                             Debug.Log(act + " : " + node.GetG());
                         }
-                        Debug.Log("______");
                     }
                     else {
                         Debug.Log("Planner failed.");
@@ -104,10 +103,6 @@ namespace Planner
 
         public List<List<HSPNode>> solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
         {
-            
-            Debug.Log ("START");
-
-            int attempts = 0;
 
             List<List<HSPNode>> planStack = new List<List<HSPNode>>();
             HashSet<string> explored = new HashSet<string>();
@@ -118,14 +113,14 @@ namespace Planner
 
             HSPNode start = new HSPNode((HSPState)init.Clone(), null, null, 0, 0);
 
-            Enqueue(start);
+            Enqueue(start, start.GetStateString());
 
             while (frontierQ.Count() > 0) {
 
                 HSPNode node = frontierQ.Dequeue();
                 HSPState state = (HSPState)node.GetState().Clone();
 
-                explored.Add(state.GetString());//State or Node?
+                explored.Add(state.ToString());//State or Node?
 
                 if (ArrivedAtGoal(goal, state)) {
                     List<HSPNode> plan = node.getPath();
@@ -142,26 +137,23 @@ namespace Planner
                     HSPState newState = DeriveNewStateFromAction(action, state);
 
                     //#if node already explored, don't bother 
-                    string stateString = newState.GetString();
+                    string stateString = newState.ToString();
                  
                     if (explored.Contains(stateString)) {
                         continue;
                     }
                        
-                    HSPNode new_node = new HSPNode((HSPState)newState.Clone(), action, node, node.GetG() + 1, 0);
+                    HSPNode new_node = new HSPNode((HSPState)newState.Clone(), action, node, (node.GetG()+1), 0);
    
                     if (!g_cost.ContainsKey(stateString)) {
                         g_cost.Add(stateString, new_node.GetG());
-                        Enqueue(new_node);
                     }
                     
-                    if (!enQueued.Contains(new_node.GetString()) || new_node.GetG() < g_cost[stateString]) {
-                        Enqueue(new_node);
+                    if (!enQueued.Contains(new_node.GetStateString()) || new_node.GetG() < g_cost[stateString]) {
+                        Enqueue(new_node, stateString);
                     }
 
                 }
-
-                attempts++;
 
             }
 
@@ -198,9 +190,9 @@ namespace Planner
             return applicables;
         }
 
-        public void Enqueue(HSPNode node) {
+        public void Enqueue(HSPNode node, string stateString) {
             frontierQ.Enqueue(node);
-            enQueued.Add(node.GetString());
+            enQueued.Add(stateString);
         }
 
         private bool ArrivedAtGoal(HSPState _goal, HSPState _state) {

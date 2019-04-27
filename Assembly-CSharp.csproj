@@ -91,12 +91,10 @@
      <Compile Include="Assets\Scripts\Player\PlayerHealth.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerShooting.cs" />
-     <Compile Include="Assets\Scripts\Utils\Cloner.cs" />
      <Compile Include="Assets\Scripts\Utils\DataController.cs" />
      <Compile Include="Assets\Scripts\Utils\EnumGenerator.cs" />
      <Compile Include="Assets\Scripts\Utils\JsonNode.cs" />
      <Compile Include="Assets\Scripts\Utils\PriorityQueue.cs" />
-     <Compile Include="Assets\Scripts\Utils\RecursiveDictionary.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
      <None Include="Assets\SurvivalShooter_Third-PartyNotice.txt" />
      <None Include="Assets\JsonDotNet\link.xml" />

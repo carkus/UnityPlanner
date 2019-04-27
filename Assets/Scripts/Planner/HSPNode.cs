@@ -1,3 +1,4 @@
+using UnityEngine;
 
 using System;
 using System.Collections;
@@ -14,10 +15,10 @@ public class HSPNode : IComparable<HSPNode> {
     private int _h;
 
     public int CompareTo(HSPNode other) {
-        if (this.GetF() < other.GetF()) {
-            return 0;
+        if (this.GetF() > other.GetF()) {
+            return 1;
         }
-        return 1;
+        return 0;
     }
 
     public HSPNode (HSPState state, HSPAction action, HSPNode parent = null, int g = 0, int h = 0) {
@@ -36,9 +37,8 @@ public class HSPNode : IComparable<HSPNode> {
         return _action;
     }
 
-
-    public string GetString() {
-        return _state.GetString();
+    public string GetStateString() {
+        return _state.ToString();
     }    
 
     public List<HSPNode> getPath() {

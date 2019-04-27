@@ -32,7 +32,7 @@ public class PlanManager
         string d = "./Assets/PDDL/robot.json";
         parseDomain(d);
 
-        string p = "./Assets/PDDL/robot-3.json";
+        string p = "./Assets/PDDL/robot-4.json";
         parseProblem(p);
 
         //Construct actions from operators with respect to problem objects:
@@ -48,7 +48,7 @@ public class PlanManager
 
     public void parseProblem(string ctxt) {
         _problem = new JSONParser();
-        _problem.parseProblem(ctxt);        
+        _problem.parseProblem(ctxt);   
     }    
 
     public void callPlanner() {
