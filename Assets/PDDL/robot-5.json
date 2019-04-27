@@ -1,0 +1,73 @@
+{
+    "objects": [
+        {
+            "room": {
+                "room1": {},
+                "room2": {},
+                "room3": {},
+                "room4": {},
+                "room5": {}
+            },
+            "object": {
+                "object1": {},
+                "object2": {},
+                "object3": {},
+                "object4": {},
+                "object5": {}
+            },
+            "arm": {
+                "left": {},
+                "right": {}            
+            }
+        }
+    ],
+    "init": [
+        {
+            "robot-at": {
+                "room1": {}
+            },
+            "object-at": {
+                "object1": {
+                    "room1": {}
+                },
+                "object2": {
+                    "room1": {}
+                },
+                "object3": {
+                    "room1": {}
+                },
+                "object4": {
+                    "room1": {}
+                },
+                "object5": {
+                    "room1": {}
+                }
+            },
+            "free": {
+                "left": {},
+                "right": {}                
+            }
+        }
+    ],
+    "goal": [
+        {
+            "object-at": {
+                "object1": {
+                    "room1": {}
+                },
+                "object2": {
+                    "room2": {}
+                },
+                "object3": {
+                    "room3": {}
+                },
+                "object4": {
+                    "room4": {}
+                },
+                "object5": {
+                    "room5": {}
+                }
+            }
+        }
+    ]
+}

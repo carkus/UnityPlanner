@@ -5,8 +5,8 @@
                 "room1": {},
                 "room2": {}
             },
-            "box": {
-                "box1": {}                
+            "object": {
+                "object1": {}                
             },
             "arm": {
                 "left": {},
@@ -19,8 +19,8 @@
             "robot-at": {
                 "room1": {}
             },
-            "box-at": {
-                "box1": {
+            "object-at": {
+                "object1": {
                     "room1": {}
                 }
             },
@@ -32,8 +32,8 @@
     ],
     "goal": [
         {
-            "box-at": {
-                "box1": {
+            "object-at": {
+                "object1": {
                     "room2": {}
                 }
             }
