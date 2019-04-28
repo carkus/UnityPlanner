@@ -52,7 +52,7 @@ public class PlanManager
     }    
 
     public void callPlanner() {
-        _planner = ProgressionPlanner.Instance;
+        _planner = ProgressionPlanner.Instance;        
         _planner.buildPlan(_problem.state, _problem.goal, _actions);
     }
 

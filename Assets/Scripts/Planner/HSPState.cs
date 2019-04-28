@@ -73,7 +73,7 @@ public class HSPState : IComparable<HSPState>, ICloneable {
        return operand1.CompareTo(operand2) <= 0;
     }
 
-    public HashSet<string> GroundedState() {
+    public HashSet<string> GroundState() {
         return _grounds;
     }
 

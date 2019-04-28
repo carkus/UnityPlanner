@@ -10,11 +10,12 @@ public class HSPPredicate : IComparable<HSPPredicate> {
 
     private string _name;
     private List<HSPTerm> _args;
-
+    private HashSet<string> _grounds;
 
     public HSPPredicate (string name, List<HSPTerm> args) {
         _args = args;
         _name = name;
+        _grounds = GroundToString();
     }
 
     public int CompareTo(HSPPredicate other) {
@@ -24,34 +25,23 @@ public class HSPPredicate : IComparable<HSPPredicate> {
         return 0;
     }
 
-    //Removed to use HashSet implementation
-    /*public bool isApplicableTo(HSPPredicate other) {
-        
-        if (this._name != other._name) {
-            return false;
-        }
+    private HashSet<string> GroundToString() {
 
-        List<string> thisArgs = new List<string>();
-        HashSet<string> otherArgs = new HashSet<string>();
+        HashSet<string> temp = new HashSet<string>();
 
-        for(int i=0; i<this._args.Count; i++) {
-            thisArgs.Add(this._args[i].GetValue());
-        }
-
-        for(int i=0; i<other._args.Count; i++) {
-            otherArgs.Add(other._args[i].GetValue());
-        }
-
-        bool found = false;
-        for(int i=0; i<thisArgs.Count; i++) {
-            if (otherArgs.Contains(thisArgs[i])) {
-                found = true;
+        string deriveGround(HSPPredicate predicate, HSPTerm arg) {
+            if (arg.IsTyped()) {
+                return $"{predicate.GetName()}({arg.GetValue()}, {arg.GetTermType()})"; 
             }
-        }
-        if (!found) return false;
+            return $"{predicate.GetName()}({arg.GetValue()})";
+        }    
         
-        return true;
-    }*/
+        foreach(HSPTerm arg in _args) {
+           temp.Add(deriveGround(this, arg));
+        }
+        return temp;
+
+    }
 
     public bool IsGrounded() {
         for (int i = 0; i < _args.Count; i++) {
@@ -115,6 +105,10 @@ public class HSPPredicate : IComparable<HSPPredicate> {
     public List<HSPTerm> GetArgs() {
         return _args;
     }  
+
+    public HashSet<string> GetGroundString() {
+        return _grounds;
+    } 
 
 
 

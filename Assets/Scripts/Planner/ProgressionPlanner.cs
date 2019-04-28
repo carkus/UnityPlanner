@@ -3,6 +3,9 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using System.Diagnostics;
+
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -20,9 +23,14 @@ namespace Planner
         private PriorityQueue<HSPNode> frontierQ = new PriorityQueue<HSPNode>();
         private HashSet<string> enQueued = new HashSet<string>();
 
-        private List<HSPNode> plan = new List<HSPNode>();
+        //private List<HSPNode> plan = new List<HSPNode>();
 
         private Thread planningThread;
+
+        private double timeGrounding = 0;
+        private double timeApplicables = 0;
+        private double timeDeriveState = 0;
+        private double timeQueueing = 0;
         
         //Singleton
         private static ProgressionPlanner instance;
@@ -53,9 +61,21 @@ namespace Planner
         }
 
         private async void PerformPlan() {
-            
-            plan = await Task.Run(() => solve(initState, goalState, groundedActions, 1, 1) );
 
+            List<HSPNode> plan = new List<HSPNode>();
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            plan = await Task.Run(() => solve(initState, goalState, groundedActions, 1, 1) );
+            watch.Stop();
+
+            UnityEngine.Debug.Log("Time taken: " + watch.Elapsed.TotalSeconds.ToString());
+            UnityEngine.Debug.Log("Time taken timeGrounding: " + timeGrounding);
+            UnityEngine.Debug.Log("Time taken timeApplicables: " + timeApplicables);
+            UnityEngine.Debug.Log("Time taken timeDeriveState: " + timeDeriveState);
+            UnityEngine.Debug.Log("Time taken timeQueueing: " + timeQueueing);
+            
+            printPlanActions(plan);
 
             List<HSPNode> solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
             {
@@ -63,8 +83,8 @@ namespace Planner
                 HashSet<string> explored = new HashSet<string>();
                 Dictionary<string, int> g_cost = new Dictionary<string, int>();
 
-                HSPState init = new HSPState(GroundPredicatesToState(_state));
-                HSPState goal = new HSPState(GroundPredicatesToState(_goal));
+                HSPState init = new HSPState(AddGroundPredicate(_state));
+                HSPState goal = new HSPState(AddGroundPredicate(_goal));
 
                 HSPNode start = new HSPNode((HSPState)init.Clone(), null, null, 0, 0);
 
@@ -114,72 +134,94 @@ namespace Planner
 
             }
 
-            foreach(HSPNode node in plan) {
-                string act = node.GetAction().GetString();
-                Debug.Log(act + " : " + node.GetG());
-            }
-
         }
 
         //-------------------------------------------------
         //UTILS
         //-------------------------------------------------
 
-        private HashSet<string> GroundPredicatesToState(List<HSPPredicate> predicates) {
+        private void printPlanActions(List<HSPNode> plan) {            
+            foreach(HSPNode node in plan) {
+                string act = node.GetAction().GetString();
+                UnityEngine.Debug.Log(act + " : " + node.GetG());
+            }
+        }
+
+        private HashSet<string> AddGroundPredicate(List<HSPPredicate> preds) {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();            
+            
             HashSet<string> grounds = new HashSet<string>();
-
-            string getGroundString(HSPPredicate predicate, HSPTerm arg) {
-                if (arg.IsTyped()) {
-                    return $"{predicate.GetName()}({arg.GetValue()}, {arg.GetTermType()})"; 
-                }
-                return $"{predicate.GetName()}({arg.GetValue()})";        
+            
+            foreach(var item in preds) {
+                grounds.UnionWith(item.GetGroundString());
             }
-
-            foreach(HSPPredicate pred in predicates) {
-                foreach(HSPTerm arg in pred.GetArgs()) {
-                    grounds.Add(getGroundString(pred, arg));
-                }
-            }
-
+            
+            watch.Stop();
+            timeGrounding += watch.Elapsed.TotalSeconds;
+            
             return grounds;
-        }        
+        }
 
         private HSPState DeriveNewStateFromAction(HSPAction action, HSPState state) {
+
+            //Stopwatch watch = new Stopwatch();
+            //watch.Start(); 
+
             //Derive New State From Action
-            HashSet<string> negEffects = GroundPredicatesToState(action._negEffects);
-            HashSet<string> posEffects = GroundPredicatesToState(action._posEffects);
+            HashSet<string> negEffects = AddGroundPredicate(action._negEffects);
+            HashSet<string> posEffects = AddGroundPredicate(action._posEffects);
 
             HashSet<string> newGrounds = new HashSet<string>();
-            foreach(var item in state.GroundedState()) {
+            foreach(var item in state.GroundState()) {
                 newGrounds.Add(item);
             }
             newGrounds.ExceptWith(negEffects);
             newGrounds.UnionWith(posEffects);
+
+            //watch.Stop();
+            //timeDeriveState += watch.Elapsed.TotalSeconds;
+
             return new HSPState(newGrounds);
         }
 
         private List<HSPAction> getApplicables(HSPState state) {
+            
+            //Stopwatch watch = new Stopwatch();
+            //watch.Start(); 
+
             List<HSPAction> applicables = new List<HSPAction>();
-            HashSet<string> groundedState = state.GroundedState();
+            HashSet<string> groundedState = state.GroundState();
             //i.e. the actions may be performed in state
             //e.g. if a.precond <= state:
             //check if preconditions of action are subset of state
             foreach(HSPAction action in groundedActions) {
-                HashSet<string> precons = GroundPredicatesToState(action._preconditions);
+                HashSet<string> precons = AddGroundPredicate(action._preconditions);
                 if (precons.IsSubsetOf(groundedState)) {
                     applicables.Add(action);
                 }
             }
+
+            //watch.Stop();
+            //timeApplicables += watch.Elapsed.TotalSeconds;
+
             return applicables;
         }
 
         private void Enqueue(HSPNode node, string stateString) {
+
+            //Stopwatch watch = new Stopwatch();
+            //watch.Start(); 
+
             frontierQ.Enqueue(node);
             enQueued.Add(stateString);
+
+            //watch.Stop();
+            //timeQueueing += watch.Elapsed.TotalSeconds;            
         }
 
         private bool ArrivedAtGoal(HSPState _goal, HSPState _state) {
-            return _goal.GroundedState().IsSubsetOf(_state.GroundedState());
+            return _goal.GroundState().IsSubsetOf(_state.GroundState());
         }
 
     }
