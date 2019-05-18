@@ -32,7 +32,7 @@ public class PlanManager
         string d = "./Assets/PDDL/robot.json";
         parseDomain(d);
 
-        string p = "./Assets/PDDL/robot-4.json";
+        string p = "./Assets/PDDL/robot-6.json";
         parseProblem(p);
 
         //Construct actions from operators with respect to problem objects:

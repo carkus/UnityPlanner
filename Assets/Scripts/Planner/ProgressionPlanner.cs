@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using System.Diagnostics;
 
@@ -77,25 +78,23 @@ namespace Planner
             
             printPlanActions(plan);
 
-            List<HSPNode> solve(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions, int _H, int _W)
+            List<HSPNode> solve(List<HSPPredicate> _initpreds, List<HSPPredicate> _goalpreds, List<HSPAction> _actions, int _H, int _W)
             {
 
                 HashSet<string> explored = new HashSet<string>();
                 Dictionary<string, int> g_cost = new Dictionary<string, int>();
 
-                HSPState init = new HSPState(AddGroundPredicate(_state));
-                HSPState goal = new HSPState(AddGroundPredicate(_goal));
+                HashSet<string> goal = AddGroundPredicate(_goalpreds);
+                HSPNode start = new HSPNode(AddGroundPredicate(_initpreds), null, null, 0, 0);
 
-                HSPNode start = new HSPNode((HSPState)init.Clone(), null, null, 0, 0);
-
-                Enqueue(start, start.GetStateString());
+                Enqueue(start, start.getStateString());
 
                 while (frontierQ.Count() > 0) {
 
                     HSPNode node = frontierQ.Dequeue();
-                    HSPState state = (HSPState)node.GetState().Clone();
+                    HashSet<string> state = node.GetState();
 
-                    explored.Add(state.ToString());//State or Node?
+                    explored.Add(node.getStateString());
 
                     if (ArrivedAtGoal(goal, state)) {
                         plan = node.getPath();
@@ -103,27 +102,29 @@ namespace Planner
                         return plan;
                     }
 
-                    List<HSPAction> applicables = getApplicables(state);
+                    foreach(HSPAction action in groundedActions) {
 
-                    foreach(HSPAction action in applicables) {
-                        
-                        HSPState newState = DeriveNewStateFromAction(action, state);
+                        if (action.isApplicableIn(state)) {
 
-                        //#if node already explored, don't bother 
-                        string stateString = newState.ToString();
-                    
-                        if (explored.Contains(stateString)) {
-                            continue;
-                        }
+                            HashSet<string> newState = DeriveNewStateFromAction(action, state);
+
+                            //#if node already explored, don't bother 
+                            string stateString = createStateString(newState);
                         
-                        HSPNode new_node = new HSPNode((HSPState)newState.Clone(), action, node, (node.GetG()+1), 0);
-    
-                        if (!g_cost.ContainsKey(stateString)) {
-                            g_cost.Add(stateString, new_node.GetG());
-                        }
-                        
-                        if (!enQueued.Contains(new_node.GetStateString()) || new_node.GetG() < g_cost[stateString]) {
-                            Enqueue(new_node, stateString);
+                            if (!explored.Contains(stateString)) {
+
+                                HSPNode new_node = new HSPNode(newState, action, node, (node.GetG()+1), 0);
+                                
+                                if (!g_cost.ContainsKey(stateString)) {
+                                    g_cost.Add(stateString, new_node.GetG());
+                                }
+                                
+                                if (!enQueued.Contains(stateString) || new_node.GetG() < g_cost[stateString]) {
+                                    Enqueue(new_node, stateString);
+                                }
+                                
+                            }                            
+
                         }
 
                     }
@@ -147,14 +148,22 @@ namespace Planner
             }
         }
 
-        private HashSet<string> AddGroundPredicate(List<HSPPredicate> preds) {
+        private string createStateString(HashSet<string> state) {
+            string sep = ", ";
+            string[] output = new string[state.Count];
+            output = state.ToArray();
+            Array.Sort(output);
+            return "( " + String.Join( sep, output ) + " )";
+        }          
+
+        private HashSet<string> AddGroundPredicate(List<HSPPredicate> _predicates) {
             Stopwatch watch = new Stopwatch();
             watch.Start();            
             
             HashSet<string> grounds = new HashSet<string>();
             
-            foreach(var item in preds) {
-                grounds.UnionWith(item.GetGroundString());
+            foreach(var predicate in _predicates) {
+                grounds.UnionWith(predicate.GetGroundString());
             }
             
             watch.Stop();
@@ -163,65 +172,32 @@ namespace Planner
             return grounds;
         }
 
-        private HSPState DeriveNewStateFromAction(HSPAction action, HSPState state) {
+        private HashSet<string> DeriveNewStateFromAction(HSPAction action, HashSet<string> groundedState) {
 
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start(); 
+            Stopwatch watch = new Stopwatch();
+            watch.Start(); 
 
             //Derive New State From Action
-            HashSet<string> negEffects = AddGroundPredicate(action._negEffects);
-            HashSet<string> posEffects = AddGroundPredicate(action._posEffects);
-
             HashSet<string> newGrounds = new HashSet<string>();
-            foreach(var item in state.GroundState()) {
+            foreach(var item in groundedState) {
                 newGrounds.Add(item);
             }
-            newGrounds.ExceptWith(negEffects);
-            newGrounds.UnionWith(posEffects);
+            newGrounds.ExceptWith(action.getNegEffects());
+            newGrounds.UnionWith(action.getPosEffects());
 
-            //watch.Stop();
-            //timeDeriveState += watch.Elapsed.TotalSeconds;
+            watch.Stop();
+            timeDeriveState += watch.Elapsed.TotalSeconds;
 
-            return new HSPState(newGrounds);
-        }
-
-        private List<HSPAction> getApplicables(HSPState state) {
-            
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start(); 
-
-            List<HSPAction> applicables = new List<HSPAction>();
-            HashSet<string> groundedState = state.GroundState();
-            //i.e. the actions may be performed in state
-            //e.g. if a.precond <= state:
-            //check if preconditions of action are subset of state
-            foreach(HSPAction action in groundedActions) {
-                HashSet<string> precons = AddGroundPredicate(action._preconditions);
-                if (precons.IsSubsetOf(groundedState)) {
-                    applicables.Add(action);
-                }
-            }
-
-            //watch.Stop();
-            //timeApplicables += watch.Elapsed.TotalSeconds;
-
-            return applicables;
+            return newGrounds;
         }
 
         private void Enqueue(HSPNode node, string stateString) {
-
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start(); 
-
             frontierQ.Enqueue(node);
             enQueued.Add(stateString);
-
-            //watch.Stop();
-            //timeQueueing += watch.Elapsed.TotalSeconds;            
         }
 
-        private bool ArrivedAtGoal(HSPState _goal, HSPState _state) {
-            return _goal.GroundState().IsSubsetOf(_state.GroundState());
+        private bool ArrivedAtGoal(HashSet<string> _goal, HashSet<string> _state) {
+            return _goal.IsSubsetOf(_state);
         }
 
     }

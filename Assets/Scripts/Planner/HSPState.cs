@@ -15,10 +15,11 @@ public class HSPState : IComparable<HSPState>, ICloneable {
         _grounds = grounds;
     }
 
-    public void applyAction(HashSet<string> _negEffects, HashSet<string> _posEffects) {
+    /*public HSPState applyAction(HashSet<string> _negEffects, HashSet<string> _posEffects) {
         this._grounds.ExceptWith(_negEffects);
         this._grounds.UnionWith(_posEffects);
-    }    
+        return (HSPState)newState;
+    } */   
 
     public object Clone() {
         HSPState newState = (HSPState) this.MemberwiseClone();

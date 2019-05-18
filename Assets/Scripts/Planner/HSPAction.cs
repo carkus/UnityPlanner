@@ -16,7 +16,11 @@ public class HSPAction {
         set;
     }
 
-    public List<HSPPredicate> _preconditions { 
+    private HashSet<string> _preConditions = new HashSet<string>();
+    private HashSet<string> _posEffects = new HashSet<string>();
+    private HashSet<string> _negEffects = new HashSet<string>();
+
+    /*public List<HSPPredicate> _preconditions { 
         get; 
         set;
     }
@@ -29,7 +33,7 @@ public class HSPAction {
     public List<HSPPredicate> _negEffects {
         get;
         set;
-    }
+    }*/
 
 
     public HSPAction(
@@ -42,10 +46,34 @@ public class HSPAction {
 
         _name = name;
         _args = args;
-        _preconditions = preconditions;
-        _posEffects = posEffects;
-        _negEffects = negEffects;
+        _preConditions = groundPredicates(preconditions);
+        _posEffects = groundPredicates(posEffects);
+        _negEffects = groundPredicates(negEffects);
 
+    }
+
+    private HashSet<string> groundPredicates(List<HSPPredicate> _predicates) {
+        HashSet<string> grounds = new HashSet<string>();
+        foreach(var predicate in _predicates) {
+            grounds.UnionWith(predicate.GetGroundString());
+        }
+        return grounds;
+    }
+
+    public HashSet<string> getPreconditions() {
+        return _preConditions;
+    }
+
+    public HashSet<string> getPosEffects() {
+        return _posEffects;
+    }
+
+    public HashSet<string> getNegEffects() {
+        return _negEffects;
+    }
+
+    public Boolean isApplicableIn(HashSet<string> state) {
+        return _preConditions.IsSubsetOf(state);
     }
 
     public string GetString() {

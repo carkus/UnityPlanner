@@ -25,7 +25,7 @@ public class WorldManager
 
         //PrimitiveType type = PrimitiveType.Cube;
 
-        for (int i = 0; i < 10; i++)
+        /*for (int i = 0; i < 10; i++)
         {
             for (int j = 0; j < 10; j++)
             {
@@ -36,7 +36,10 @@ public class WorldManager
                 obj.setColor(randomType);
 
             }
-        }
+        }*/
+
+
+        //_domain = new JSONParser();
 
         awake = true;
 
@@ -45,6 +48,7 @@ public class WorldManager
 
     public void frameTick()
     {
+
         if (awake) {
 
             //Debug.Log("I AM AWAKE!!!");

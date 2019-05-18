@@ -3,12 +3,14 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class HSPNode : IComparable<HSPNode> {
 
-    private HSPState _state;
+    private HashSet<string> _state;
     private HSPAction _action ;
     private HSPNode _parent;
+    private string _stateString;
     
     private int _f;
     private int _g;
@@ -21,24 +23,41 @@ public class HSPNode : IComparable<HSPNode> {
         return 0;
     }
 
-    public HSPNode (HSPState state, HSPAction action, HSPNode parent = null, int g = 0, int h = 0) {
+    public HSPNode (HashSet<string> state, HSPAction action, HSPNode parent = null, int g = 0, int h = 0) {
         _state = state;
         _action = action;
         _parent = parent;
         _g = g;
         _h = h;
+        _stateString = setStateString();
     }
 
-    public HSPState GetState() {
-        return (HSPState)_state.Clone();
+    public HashSet<string> GetState() {
+        HashSet<string> state = new HashSet<string>();
+        foreach(string predicate in _state) {
+            state.Add(predicate);
+        }
+        return state;
     }
+
+    /*public HSPState GetState() {
+        return (HSPState)_state.Clone();
+    }*/
 
     public HSPAction GetAction() {
         return _action;
     }
 
-    public string GetStateString() {
-        return _state.ToString();
+    public string getStateString() {
+        return _stateString;
+    }
+
+    private string setStateString() {
+        string sep = ", ";
+        string[] output = new string[_state.Count];
+        output = _state.ToArray();
+        Array.Sort(output);
+        return "( " + String.Join( sep, output ) + " )";
     }    
 
     public List<HSPNode> getPath() {
