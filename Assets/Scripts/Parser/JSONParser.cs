@@ -42,10 +42,6 @@ public class JSONParser
     public List<HSPPredicate> state { get; set; }
     public List<HSPPredicate> goal { get; set; }
 
-    public Action buildType { get; set; }
-
-    List<JsonNode> domainNodes;
-    List<JsonNode> problemNodes;
 
     public JSONParser() { 
         typeParser = TypeParser.Instance;
@@ -57,19 +53,13 @@ public class JSONParser
         goalStateParser = StateParser.Instance;
     }
 
-    public void parseDomain(string ctxt) 
+    public List<JsonNode> parseJSONDomain(string ctxt) 
     {        
-        domainNodes = new List<JsonNode>();
-        domainNodes.Clear();
-        domainNodes = ParseJSONFilename(ctxt);
+        List<JsonNode> nodes = new List<JsonNode>();
+        nodes.Clear();
+        nodes = ParseJSONFilename(ctxt);
+        return nodes;
     } 
-
-    public void parseProblem(string ctxt) 
-    {        
-        problemNodes = new List<JsonNode>();
-        problemNodes.Clear();
-        problemNodes = ParseJSONFilename(ctxt);
-    }
 
     public List<JsonNode> ParseJSONFilename(string ctxt)
     {

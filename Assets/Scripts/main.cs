@@ -31,8 +31,11 @@ public class main : MonoBehaviour
     {        
 
         planManager = new PlanManager();
-        planManager.groundProblem();
-        planManager.callPlanner();
+        
+        //planManager.initPlanner();
+        //for (int a=0; a<5; a++) {
+        //}
+        //planManager.callPlanner();
         
         worldManager = new WorldManager();
         worldManager.startWorld();
@@ -47,6 +50,7 @@ public class main : MonoBehaviour
     {
         worldManager.frameTick();
         objectManager.frameTick();
+        planManager.frameTick();
     }
 
     T[] InitializeArray<T>(int length) where T : new()

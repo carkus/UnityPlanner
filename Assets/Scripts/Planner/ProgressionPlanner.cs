@@ -33,59 +33,24 @@ namespace Planner
         private double timeDeriveState = 0;
         private double timeQueueing = 0;
         
-        //Singleton
-        private static ProgressionPlanner instance;
-        private ProgressionPlanner()
+        public ProgressionPlanner()
         {
         }
 
-        public static ProgressionPlanner Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new ProgressionPlanner();
-                }
-                return instance;
-            }
-        }
+        public async Task<List<HSPNode>> PerformPlan(List<HSPPredicate> _init, List<HSPPredicate> _goal, List<HSPAction> _actions) {
 
-        public void buildPlan(List<HSPPredicate> _state, List<HSPPredicate> _goal, List<HSPAction> _actions) {
-
-            initState = _state;
-            //initState = RemoveRedundanciesFromState(_state, _goal);
-            goalState = _goal;
-            groundedActions = _actions;
-            PerformPlan();
-
-        }
-
-        private async void PerformPlan() {
-
-            List<HSPNode> plan = new List<HSPNode>();
-
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            plan = await Task.Run(() => solve(initState, goalState, groundedActions, 1, 1) );
-            watch.Stop();
-
-            UnityEngine.Debug.Log("Time taken: " + watch.Elapsed.TotalSeconds.ToString());
-            UnityEngine.Debug.Log("Time taken timeGrounding: " + timeGrounding);
-            UnityEngine.Debug.Log("Time taken timeApplicables: " + timeApplicables);
-            UnityEngine.Debug.Log("Time taken timeDeriveState: " + timeDeriveState);
-            UnityEngine.Debug.Log("Time taken timeQueueing: " + timeQueueing);
+            return await Task.Run(() => solve() );
             
-            printPlanActions(plan);
-
-            List<HSPNode> solve(List<HSPPredicate> _initpreds, List<HSPPredicate> _goalpreds, List<HSPAction> _actions, int _H, int _W)
+            List<HSPNode> solve()
             {
+                
+                List<HSPNode> plan = new List<HSPNode>();
 
                 HashSet<string> explored = new HashSet<string>();
                 Dictionary<string, int> g_cost = new Dictionary<string, int>();
 
-                HashSet<string> goal = AddGroundPredicate(_goalpreds);
-                HSPNode start = new HSPNode(AddGroundPredicate(_initpreds), null, null, 0, 0);
+                HashSet<string> goal = groundPredicates(_goal);
+                HSPNode start = new HSPNode(groundPredicates(_init), null, null, 0, 0);
 
                 Enqueue(start, start.getStateString());
 
@@ -102,7 +67,7 @@ namespace Planner
                         return plan;
                     }
 
-                    foreach(HSPAction action in groundedActions) {
+                    foreach(HSPAction action in _actions) {
 
                         if (action.isApplicableIn(state)) {
 
@@ -123,9 +88,9 @@ namespace Planner
                                     Enqueue(new_node, stateString);
                                 }
                                 
-                            }                            
+                            }
 
-                        }
+                        }                      
 
                     }
 
@@ -154,9 +119,19 @@ namespace Planner
             output = state.ToArray();
             Array.Sort(output);
             return "( " + String.Join( sep, output ) + " )";
-        }          
+        }
 
-        private HashSet<string> AddGroundPredicate(List<HSPPredicate> _predicates) {
+        private List<HSPAction> getApplicableActions(HashSet<string> state, List<HSPAction> actions)    {
+            List<HSPAction> _applicables = new List<HSPAction>();
+            foreach(HSPAction action in actions) {
+                if (action.isApplicableIn(state)) {
+                    _applicables.Add(action);
+                }
+            }
+            return _applicables;
+        }
+
+        private HashSet<string> groundPredicates(List<HSPPredicate> _predicates) {
             Stopwatch watch = new Stopwatch();
             watch.Start();            
             
