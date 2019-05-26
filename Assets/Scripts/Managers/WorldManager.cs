@@ -17,32 +17,7 @@ public class WorldManager
 
     public void startWorld()
     {
-        // Set up the reference.
-        //text = GetComponent <Text> ();
-
-        // Reset the score.
-        //score = 0;
-
-        //PrimitiveType type = PrimitiveType.Cube;
-
-        /*for (int i = 0; i < 10; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                OBase obj = new OBase();
-                OType randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
-                obj.setPosition(new Vector3(i*2, 0, j*2));
-                obj.setType(randomType);
-                obj.setColor(randomType);
-
-            }
-        }*/
-
-
-        //_domain = new JSONParser();
-
         awake = true;
-
     }
 
 

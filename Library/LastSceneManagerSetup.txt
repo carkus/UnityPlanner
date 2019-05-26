@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/HSP.unity
+- path: E:/@2019/AIandGames-master/AIandGames-master/UnityPathfinding/1-NavMeshBasics/Assets/Scenes/NavMeshBasic.unity
   isLoaded: 1
   isActive: 1

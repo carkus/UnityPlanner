@@ -24,13 +24,14 @@ public class main : MonoBehaviour
     /// </summary>
     void Awake()
     {
+        objectManager = GameObject.Find("main").AddComponent(typeof(ObjectManager)) as ObjectManager;
     }   
 
     // Start is called before the first frame update
     void Start()
     {        
 
-        planManager = new PlanManager();
+        //planManager = new PlanManager();
         
         //planManager.initPlanner();
         //for (int a=0; a<5; a++) {
@@ -40,7 +41,7 @@ public class main : MonoBehaviour
         worldManager = new WorldManager();
         worldManager.startWorld();
 
-        objectManager = new ObjectManager();
+        //objectManager = AddComponent(typeof(SphereCollider)) as SphereCollider;
         objectManager.setWorld(worldManager.worldObjects);
 
     }
@@ -49,8 +50,8 @@ public class main : MonoBehaviour
     void Update()
     {
         worldManager.frameTick();
-        objectManager.frameTick();
-        planManager.frameTick();
+        //objectManager.frameTick();
+        //planManager.frameTick();
     }
 
     T[] InitializeArray<T>(int length) where T : new()

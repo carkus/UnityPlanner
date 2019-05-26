@@ -28,12 +28,12 @@ public class PlanManager
 
     public PlanManager () {
 
-            for (int i=5; i>0; i--) {
-                Plan plan = new Plan("plan"+(i+1).ToString(), "robot", "robot-"+(i).ToString(), null);
-                planAgenda.Add(plan);
-            }
+        for (int i=25; i>0; i--) {
+            Plan plan = new Plan("plan"+(i+1).ToString(), "robot", "robot-"+((i%4)+1).ToString(), null);
+            planAgenda.Add(plan);
+        }
 
-            awake = true;
+        awake = true;
 
     }
 
@@ -62,16 +62,10 @@ public class PlanManager
     }
     
     public void initPlanner(string _label, string _dname, string _pname) {
-
-        string d = "./Assets/PDDL/" + _dname + ".json";
-        string p = "./Assets/PDDL/" + _pname + ".json";
-
-        JSONParser _domain = parseJSON(d);
-        JSONParser _problem = parseJSON(p);
+        JSONParser _domain = parseJSON("./Assets/PDDL/" + _dname + ".json");
+        JSONParser _problem = parseJSON("./Assets/PDDL/" + _pname + ".json");
         List<HSPAction> _actions = groundActions(_domain, _problem);
-
         callPlanner(_label, _problem, _actions);
-
     }
 
     public async void callPlanner(string _planId, JSONParser _problem, List<HSPAction> _actions) {

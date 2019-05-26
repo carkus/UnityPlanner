@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
-public class ObjectManager
+
+public class ObjectManager : MonoBehaviour
 {
     private GameObject[] citizens;
 
-    public Transform[] spawnPoints;         // An array of the spawn points this enemy can spawn from.
-    public float spawnTime = 3f;            // How long between each spawn.
+    //public Transform[] spawnPoints;         // An array of the spawn points this enemy can spawn from.
+    //public float spawnTime = 3f;            // How long between each spawn.
 
-    void Start ()
+    public NavMeshSurface surface;
+    public NavMeshBaker navMeshBaker;
+
+    void Awake ()
     {
+        navMeshBaker = GameObject.Find("main").AddComponent(typeof(NavMeshBaker)) as NavMeshBaker;
         // Call the Spawn function after a delay of the spawnTime and then continue to call after the same amount of time.
         //InvokeRepeating ("Spawn", spawnTime, spawnTime);
     }
@@ -26,6 +32,51 @@ public class ObjectManager
 
     public void setWorld(OBase[] worldObjects) 
     {
+        
+
+
+        OBase plane = new OBase(PrimitiveType.Plane);
+        plane.setScale(10f, 1f, 10f);
+        plane.setPosition(new Vector3(5f, 0, 5f));
+
+        NavMeshSurface surface = plane.getBody().AddComponent(typeof(NavMeshSurface)) as NavMeshSurface;
+
+        navMeshBaker.addMeshSurface(surface);
+        navMeshBaker.bakeNavMeshSurfaces();
+
+
+
+
+        //PrimitiveType type = PrimitiveType.Cube;
+        OType randomType;
+
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                OBase obj = new OBase(PrimitiveType.Cube);
+                randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
+                obj.setPosition(new Vector3(i*5, 0, j*6));
+                obj.setType(randomType);
+                obj.setColor(randomType);                
+                obj.makeObstacle();
+            }
+        }
+
+        OBase agent = new OBase(PrimitiveType.Sphere);
+        randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
+        agent.setPosition(new Vector3(0, 1, 0));
+        agent.setType(randomType);
+        agent.setColor(randomType);
+        agent.makeAgent();
+        agent.SetDestination();
+
+
+
+        //surface.BuildNavMesh();
+
+        
+
 
     }
 
