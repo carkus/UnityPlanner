@@ -29,9 +29,10 @@ namespace Planner
         private Thread planningThread;
 
         private double timeGrounding = 0;
-        private double timeApplicables = 0;
         private double timeDeriveState = 0;
-        private double timeQueueing = 0;
+        
+        //private double timeApplicables = 0;
+        //private double timeQueueing = 0;
         
         public ProgressionPlanner()
         {

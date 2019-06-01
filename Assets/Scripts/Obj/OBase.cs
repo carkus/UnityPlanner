@@ -7,8 +7,6 @@ public class OBase
 
     protected GameObject body;
     protected OMovement mover;
-    
-    //public Color baseColor = Color.white;
 
     protected ODefinition definition = new ODefinition();
     protected OColor baseColor = new OColor();
@@ -17,8 +15,9 @@ public class OBase
     protected NavMeshAgent navAgent;
     protected NavMeshObstacle navObstacle;
 
+    private Renderer renderer;
 
-    public Renderer renderer;
+    private string name;
 
     public OBase (PrimitiveType type) {
         
@@ -41,8 +40,8 @@ public class OBase
         navObstacle.carving = true;
     }
 
-    public void SetDestination() {
-        mover.SetDestination();
+    public void setDestination(Vector3 destination) {
+        mover.SetDestination(destination);
     }
 
     public GameObject getBody()

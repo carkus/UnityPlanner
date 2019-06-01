@@ -12,7 +12,7 @@ public class ObjectManager : MonoBehaviour
     public NavMeshSurface surface;
     public NavMeshBaker navMeshBaker;
 
-    void Awake ()
+    void Awake()
     {
         navMeshBaker = GameObject.Find("main").AddComponent(typeof(NavMeshBaker)) as NavMeshBaker;
         // Call the Spawn function after a delay of the spawnTime and then continue to call after the same amount of time.
@@ -23,16 +23,16 @@ public class ObjectManager : MonoBehaviour
     {
         //if (awake) {
 
-            //Debug.Log("I AM AWAKE!!!");
+        //Debug.Log("I AM AWAKE!!!");
 
         //}
         // Set the displayed text to be the word "Score" followed by the score value.
         //text.text = "Score: " + score;
     }
 
-    public void setWorld(OBase[] worldObjects) 
+    public void setWorld(OBase[] worldObjects)
     {
-        
+
 
 
         OBase plane = new OBase(PrimitiveType.Plane);
@@ -56,31 +56,44 @@ public class ObjectManager : MonoBehaviour
             {
                 OBase obj = new OBase(PrimitiveType.Cube);
                 randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
-                obj.setPosition(new Vector3(i*5, 0, j*6));
+                obj.setPosition(new Vector3(i * 4, 0, j * 4));
                 obj.setType(randomType);
-                obj.setColor(randomType);                
+                obj.setColor(randomType);
+                obj.setScale(2f, 2f, 2f);
                 obj.makeObstacle();
             }
         }
 
-        OBase agent = new OBase(PrimitiveType.Sphere);
-        randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
-        agent.setPosition(new Vector3(0, 1, 0));
-        agent.setType(randomType);
-        agent.setColor(randomType);
-        agent.makeAgent();
-        agent.SetDestination();
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+
+
+                OBase agent = new OBase(PrimitiveType.Sphere);
+                randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
+                agent.setPosition(new Vector3(i * 4, 0, j * 4));
+                agent.setType(randomType);
+                agent.setColor(randomType);
+                agent.makeAgent();
+
+                Vector3 targetVector = new Vector3(50f, 0, 20f);
+                agent.setDestination(targetVector);
+
+            }
+
+        }
 
 
 
         //surface.BuildNavMesh();
 
-        
+
 
 
     }
 
-    void Spawn ()
+    void Spawn()
     {
         // If the player has no health left...
         /* /if(playerHealth.currentHealth <= 0f)
@@ -96,5 +109,5 @@ public class ObjectManager : MonoBehaviour
         Instantiate (enemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);*/
     }
 
-    
+
 }

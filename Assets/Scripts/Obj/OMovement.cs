@@ -35,13 +35,10 @@ public class OMovement : MonoBehaviour
         }
 	}*/
 
-    public void SetDestination()
+    public void SetDestination(Vector3 destination)
     {
-        Vector3 targetVector = new Vector3(50f, 0, 20f);//_destination.transform.position;
-        
         navMeshAgent = GetComponent <NavMeshAgent> ();
-        navMeshAgent.SetDestination(targetVector);
-
+        navMeshAgent.SetDestination(destination);
     }
 
     //Protected, virtual functions can be overridden by inheriting classes.
@@ -52,7 +49,6 @@ public class OMovement : MonoBehaviour
 
         //Get a component reference to this object's Rigidbody2D
         rb2D = GetComponent <Rigidbody2D> ();
-
 
         //By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
         inverseMoveTime = 1f / moveTime;

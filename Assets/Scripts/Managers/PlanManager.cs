@@ -17,24 +17,20 @@ using Planner;
 public class PlanManager
 {
 
-    List<string> planLabels = new List<string>() { "Plan-", "Plan-1", "Plan-1", "Thursday", "Friday", "Saturday", "Sunday" };
+    private Dictionary <string, Plan> planStack = new Dictionary <string, Plan>();
+    private List<Plan> planAgenda = new List<Plan>();
 
-    Dictionary <string, Plan> planStack = new Dictionary <string, Plan>();
-    List<Plan> planAgenda = new List<Plan>();
+    private PreProcessor _processor;
+    private WorldManager _world;
 
-    PreProcessor _processor;
+    JSONParser _domain;
+    JSONParser _problem; 
 
-    Boolean awake = false;
+    private Boolean awake = false;
 
-    public PlanManager () {
-
-        for (int i=25; i>0; i--) {
-            Plan plan = new Plan("plan"+(i+1).ToString(), "robot", "robot-"+((i%4)+1).ToString(), null);
-            planAgenda.Add(plan);
-        }
-
+    public PlanManager (WorldManager world) {
+        _world = world;
         awake = true;
-
     }
 
     public void frameTick() {
@@ -42,33 +38,51 @@ public class PlanManager
         if (awake) {
         
             if (planAgenda.Count > 0) {
-                if (!planStack.ContainsKey(planAgenda[0].getLabel())) {
-                    planStack.Add(planAgenda[0].getLabel(), planAgenda[0]);
-                    initPlanner(planAgenda[0].getLabel(), planAgenda[0].getDomain(), planAgenda[0].getProblem());
-                    planAgenda.RemoveAt(0);
+                for (int i=0; i<planAgenda.Count; i++) {   
+                    if (!planStack.ContainsKey(planAgenda[i].getLabel()) && planAgenda[i].isAccessible()) {
+                        planAgenda[i].setAccessible(false);
+                        planStack.Add(planAgenda[i].getLabel(), planAgenda[i]);
+                        initPlanner(planAgenda[i].getLabel(), planAgenda[i].getDomainLabel(), planAgenda[i].getProblemLabel());
+                        planAgenda.RemoveAt(i);
+                    }
+                }                
+            }
+            
+            if (planStack.Count > 0) {
+
+                foreach (var item in planStack) {
+                    if (planStack[item.Key].isAccessible()) {
+                        if (planStack[item.Key].getPlan().Count > 0) {
+                            printPlanActions(planStack[item.Key]);
+                            
+                            //Send plan into the world
+                            planStack[item.Key].setProblem(_problem);
+                            _world.addPlanToWorld(planStack[item.Key]);
+
+                            //Set inaccessible in this scope 
+                            planStack[item.Key].setAccessible(false);
+                        }
+                    }
                 }
             }
-
-            foreach(var item in planStack) {
-                if (planStack[item.Key].getAccessible()) {
-                    UnityEngine.Debug.Log(item.Key);
-                    printPlanActions(planStack[item.Key].getPlan());
-                    planStack[item.Key].setAccessible(false);
-                }
-            }
-
         }
 
     }
+
+    public void addNewPlan(string _label, string _dname, string _pname) {
+        Plan plan = new Plan(_label, _dname, _pname, null);
+        plan.setAccessible(true);
+        planAgenda.Add(plan);
+    }
     
-    public void initPlanner(string _label, string _dname, string _pname) {
-        JSONParser _domain = parseJSON("./Assets/PDDL/" + _dname + ".json");
-        JSONParser _problem = parseJSON("./Assets/PDDL/" + _pname + ".json");
+    private void initPlanner(string _label, string _dname, string _pname) {
+        _domain = parseJSON("./Assets/PDDL/" + _dname + ".json");
+        _problem = parseJSON("./Assets/PDDL/" + _pname + ".json");
         List<HSPAction> _actions = groundActions(_domain, _problem);
         callPlanner(_label, _problem, _actions);
     }
 
-    public async void callPlanner(string _planId, JSONParser _problem, List<HSPAction> _actions) {
+    private async void callPlanner(string _planId, JSONParser _problem, List<HSPAction> _actions) {
 
         Stopwatch watch = new Stopwatch();
         watch.Start();
@@ -76,34 +90,38 @@ public class PlanManager
         ProgressionPlanner _planner = new ProgressionPlanner();
         Task<List<HSPNode>> planTask = _planner.PerformPlan(_problem.state, _problem.goal, _actions);
         List<HSPNode> plan = await planTask;
-        planStack[_planId].setPlan(plan);
-        planStack[_planId].setAccessible(true);
-        //printPlanActions(planStack[_planId]);
 
         watch.Stop();
 
         UnityEngine.Debug.Log(_planId + " : Time taken: " + watch.Elapsed.TotalSeconds.ToString());
 
+        planStack[_planId].setPlan(plan);
+        planStack[_planId].setAccessible(true);
+
     }
 
-    public JSONParser parseJSON(string ctxt) {
+    private JSONParser parseJSON(string ctxt) {
         JSONParser parse = new JSONParser();
         parse.parseJSONDomain(ctxt);
         return parse;
     }
 
-    public List<HSPAction> groundActions(JSONParser _domain, JSONParser _problem) {
+    private List<HSPAction> groundActions(JSONParser _domain, JSONParser _problem) {
         List<HSPAction> actions = new List<HSPAction>();
         _processor = PreProcessor.Instance;
         actions = _processor.groundActions(_domain.operations, _problem.objects);
         return actions;
     }
 
-    private void printPlanActions(List<HSPNode> plan) {            
-        foreach(HSPNode node in plan) {
-            string act = node.GetAction().GetString();
-            UnityEngine.Debug.Log(act + " : " + node.GetG());
+    private void printPlanActions(Plan plan) {
+        List<HSPNode> planNodes = plan.getPlan();
+        foreach(HSPNode node in planNodes) {
+            UnityEngine.Debug.Log(plan.getLabel() + " : " + node.GetG() + " : " + node.GetAction().GetString());
         }
+    }
+
+    public Plan getStackedPlan(string _label) {
+        return planStack[_label];
     }
 
     

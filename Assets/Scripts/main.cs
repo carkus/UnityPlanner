@@ -31,14 +31,22 @@ public class main : MonoBehaviour
     void Start()
     {        
 
-        //planManager = new PlanManager();
+        worldManager = new WorldManager();
+        
+        planManager = new PlanManager(worldManager);
+        planManager.addNewPlan("blueraincoat", "robot", "robot-3");
+
+
+
+
+
         
         //planManager.initPlanner();
         //for (int a=0; a<5; a++) {
         //}
         //planManager.callPlanner();
         
-        worldManager = new WorldManager();
+        
         worldManager.startWorld();
 
         //objectManager = AddComponent(typeof(SphereCollider)) as SphereCollider;
@@ -51,7 +59,7 @@ public class main : MonoBehaviour
     {
         worldManager.frameTick();
         //objectManager.frameTick();
-        //planManager.frameTick();
+        planManager.frameTick();
     }
 
     T[] InitializeArray<T>(int length) where T : new()

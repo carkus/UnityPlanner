@@ -8,15 +8,17 @@ public class Plan
 {
 
     private Boolean _accessible = false;
+    private Boolean _added = false;
     private string _label;
-    private string _domain;
-    private string _problem;
+    private string _domainLabel;
+    private string _problemLabel;
+    private JSONParser _problem;
     private List<HSPNode> _plan = new List<HSPNode>();
 
-    public Plan(string label, string domain, string problem, List<HSPNode> plan) {
+    public Plan(string label, string dname, string pname, List<HSPNode> plan) {
         _label = label;
-        _domain = domain;
-        _problem = problem;
+        _domainLabel = dname;
+        _problemLabel = pname;
         _plan = plan;
     }
 
@@ -24,13 +26,21 @@ public class Plan
         return _label;
     }
 
-    public string getDomain() {
-        return _domain;
+    public string getDomainLabel() {
+        return _domainLabel;
     }
 
-    public string getProblem() {
-        return _problem;
+    public string getProblemLabel() {
+        return _problemLabel;
+    }   
+
+    public void setProblem(JSONParser problem) {
+        _problem = problem;
     }        
+
+    public JSONParser getProblem() {
+        return _problem;
+    }           
 
     public List<HSPNode> getPlan() {
         return _plan;
@@ -40,9 +50,18 @@ public class Plan
         _plan = plan;
     }
 
-    public Boolean getAccessible() {
+    public Boolean isAddedToWorld() {
+        return _added;
+    } 
+
+    public Boolean isAccessible() {
         return _accessible;
     } 
+
+    public void setAddedToWorld(Boolean value) {
+        _added = value;
+    }   
+
 
     public void setAccessible(Boolean value) {
         _accessible = value;

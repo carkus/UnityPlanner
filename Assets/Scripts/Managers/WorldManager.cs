@@ -1,36 +1,70 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 using System.Collections;
+using System.Collections.Generic;
 
 public class WorldManager
 {
     public static int score;        // The player's score.
 
-    public OBase[] worldObjects {
+    private Dictionary<string, Plan> planStack = new Dictionary<string, Plan>();
+
+    public OBase[] worldObjects
+    {
         get;
-        set;        
+        set;
     }
 
     public bool awake;
 
-    //Text text;                      // Reference to the Text component.
+    public WorldManager() 
+    {
+    }
 
     public void startWorld()
     {
         awake = true;
     }
 
+    public void addPlanToWorld(Plan _plan)
+    {
+        planStack.Add(_plan.getLabel(), _plan);
+    }
+
 
     public void frameTick()
     {
 
-        if (awake) {
+        if (awake)
+        {
+            if (planStack.Count > 0)
+            {
+                foreach (var item in planStack)
+                {
+                    if (!planStack[item.Key].isAddedToWorld())
+                    {
+                        planStack[item.Key].setAddedToWorld(true);
+                        populateFromPlan(planStack[item.Key]);
+                    }
+                }
 
-            //Debug.Log("I AM AWAKE!!!");
-
+                //TODO - Clean up planStack when no longer needed...
+                
+            }
         }
-        // Set the displayed text to be the word "Score" followed by the score value.
-        //text.text = "Score: " + score;
+
+
+    }
+
+    private void populateFromPlan(Plan _plan) 
+    {
+        
+        JSONParser _problem = _plan.getProblem();
+
+        //Compile Plan Objects
+
+
     }
 
 
@@ -43,6 +77,6 @@ public class WorldManager
         }
         return array;
     }
-    
-        
+
+
 }
