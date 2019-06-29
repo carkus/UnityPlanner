@@ -7,64 +7,70 @@ using System.Collections.Generic;
 public class Plan
 {
 
-    private Boolean _accessible = false;
-    private Boolean _added = false;
-    private string _label;
-    private string _domainLabel;
-    private string _problemLabel;
-    private JSONParser _problem;
-    private List<HSPNode> _plan = new List<HSPNode>();
+    private Boolean accessible = false;
+    private Boolean added = false;
+    private string label;
+    private string domainLabel;
+    private string problemLabel;
 
-    public Plan(string label, string dname, string pname, List<HSPNode> plan) {
-        _label = label;
-        _domainLabel = dname;
-        _problemLabel = pname;
-        _plan = plan;
+    private JSONParser problem;
+    private List<HSPNode> planNodes = new List<HSPNode>();
+    private List<OBase> objectList = new List<OBase>();
+
+    public Plan(string _label, string _dname, string _pname, List<OBase> _objects) {
+        label = _label;
+        domainLabel = _dname;
+        problemLabel = _pname;
+        objectList = _objects;
     }
 
     public string getLabel() {
-        return _label;
+        return label;
     }
 
     public string getDomainLabel() {
-        return _domainLabel;
+        return domainLabel;
     }
 
     public string getProblemLabel() {
-        return _problemLabel;
-    }   
+        return problemLabel;
+    } 
 
-    public void setProblem(JSONParser problem) {
-        _problem = problem;
+    public List<OBase> getPlanObjects() {
+        return objectList;
+    }     
+
+    public void setProblem(JSONParser _problem) {
+        problem = _problem;
     }        
 
     public JSONParser getProblem() {
-        return _problem;
+        return problem;
     }           
 
     public List<HSPNode> getPlan() {
-        return _plan;
+        return planNodes;
     }
 
     public void setPlan(List<HSPNode> plan) {
-        _plan = plan;
+        planNodes = plan;
     }
 
     public Boolean isAddedToWorld() {
-        return _added;
+        return added;
     } 
 
     public Boolean isAccessible() {
-        return _accessible;
+        return accessible;
     } 
 
     public void setAddedToWorld(Boolean value) {
-        _added = value;
+        added = value;
     }   
 
 
     public void setAccessible(Boolean value) {
-        _accessible = value;
+        accessible = value;
     }   
 
 

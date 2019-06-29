@@ -32,6 +32,10 @@ public class WorldManager
         planStack.Add(_plan.getLabel(), _plan);
     }
 
+    public void addObjectsToWorld(List<OBase> _objects)
+    {
+        return;
+    }    
 
     public void frameTick()
     {
@@ -45,7 +49,7 @@ public class WorldManager
                     if (!planStack[item.Key].isAddedToWorld())
                     {
                         planStack[item.Key].setAddedToWorld(true);
-                        populateFromPlan(planStack[item.Key]);
+                        //populateFromPlan(planStack[item.Key]);
                     }
                 }
 
@@ -64,6 +68,12 @@ public class WorldManager
 
         //Compile Plan Objects
 
+        foreach(HSPPredicate type in _problem.objects) {
+
+            //Debug.Log("TYPE: " + type.GetName());
+
+        }
+        
 
     }
 

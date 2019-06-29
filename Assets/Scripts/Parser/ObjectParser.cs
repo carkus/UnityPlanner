@@ -41,7 +41,8 @@ public class ObjectParser : IParser<HSPPredicate>
     public List<HSPTerm> DeriveArgs(IDictionary<string, JsonNode> nodes) {
         List<HSPTerm> args = new List<HSPTerm>();
         foreach (var item in nodes) {
-            if (item.Value.Members.Count > 0) {
+            
+            /*if (item.Value.Members.Count > 0) {
                 foreach (var member in item.Value.Members) {
                     HSPTerm newarg = new HSPTerm(item.Key, member.Key, null);
                     args.Add(newarg);
@@ -50,7 +51,10 @@ public class ObjectParser : IParser<HSPPredicate>
             else {
                 HSPTerm newarg = new HSPTerm(item.Key, null, null);
                 args.Add(newarg);                
-            }
+            }*/
+
+            HSPTerm newarg = new HSPTerm(item.Key, null, null);
+            args.Add(newarg);                 
         }
         return args;
     } 

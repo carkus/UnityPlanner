@@ -15,32 +15,44 @@ public class OBase
     protected NavMeshAgent navAgent;
     protected NavMeshObstacle navObstacle;
 
+    private HSPPredicate predicate;
+    private PrimitiveType? primitive;
     private Renderer renderer;
 
     private string name;
+    private Vector3 position = new Vector3(0, 0, 0);
+    private Vector3 scale = new Vector3(1f, 1f, 1f);
 
-    public OBase (PrimitiveType type) {
-        
-        body = GameObject.CreatePrimitive(type);
-
-        renderer = body.GetComponent<Renderer>();
-        renderer.material.color = baseColor.colorSet[0];
-
-        mover = body.AddComponent(typeof(OMovement)) as OMovement;        
+    public OBase() { 
     }
 
-    public void makeAgent() {
+    public void build()
+    {
+        if (primitive.HasValue)
+        {
+            body = GameObject.CreatePrimitive(primitive.Value);
+            renderer = body.GetComponent<Renderer>();
+            renderer.material.color = baseColor.colorSet[0];
+            //redraw();
+        }
+    }
+
+    public void makeAgent()
+    {
         collider = body.AddComponent(typeof(SphereCollider)) as SphereCollider;
         navAgent = body.AddComponent<NavMeshAgent>();
+        mover = body.AddComponent(typeof(OMovement)) as OMovement;
     }
 
-    public void makeObstacle() {
+    public void makeObstacle()
+    {
         collider = body.AddComponent(typeof(SphereCollider)) as SphereCollider;
         navObstacle = body.AddComponent<NavMeshObstacle>();
         navObstacle.carving = true;
     }
 
-    public void setDestination(Vector3 destination) {
+    public void setDestination(Vector3 destination)
+    {
         mover.SetDestination(destination);
     }
 
@@ -48,28 +60,57 @@ public class OBase
     {
         return body;
     }
- 
 
-    public void setPosition(Vector3 pos)
+    public HSPPredicate getPredicate()
     {
-        body.transform.position = pos;
+        return predicate;
     }
 
-    public void setScale(float _x, float _y, float _z)
+    public void setPredicate(HSPPredicate _predicate)
     {
-        body.transform.localScale = new Vector3(_x, _y, _z);
-    }    
+        predicate = _predicate;
+    }
+
+    public void setPrimitive(PrimitiveType? _primitive)
+    {
+        primitive = _primitive;
+    }
+
+    public PrimitiveType? getPrimitive()
+    {
+        return primitive;
+    }
+
+    public void setPosition(Vector3 _value)
+    {
+        position = _value;
+    }
+
+    public void setScale(Vector3 _value)
+    {
+        scale = _value;
+    }
+
+    public void setName(string _value)
+    {
+        name = _value;
+    }
 
     public void setType(OType type)
     {
         definition._type = type;
     }
 
-    public void setColor(OType type)
+    public void redraw()
     {
-        //baseColor.g += 0.1f;
+        renderer.material.color = baseColor.colorSet[(int)definition._type];
+        body.transform.localScale = scale;
+        body.transform.position = position;
+    }
 
-        renderer.material.color = baseColor.colorSet[(int)type];
+    public string getName()
+    {
+        return name;
     }
 
 }

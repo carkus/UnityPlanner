@@ -1,11 +1,4 @@
 {
-    "types": [
-        {
-            "room": {},
-            "arm": {},
-            "object": {}
-        }
-    ],
     "predicates": [
         {
             "robot-at": {

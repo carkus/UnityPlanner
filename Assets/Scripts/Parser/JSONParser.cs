@@ -94,9 +94,9 @@ public class JSONParser
     private void GetNodeTreeFromKey(JsonNode node, string key) {
 
         switch (key) {
-            case Config.Constants.JSON_NODELABEL_TYPES:
+            /*case Config.Constants.JSON_NODELABEL_TYPES:
                 types = new List<HSPType>( typeParser.ParseNode(node) );
-            break;
+            break;*/
             case Config.Constants.JSON_NODELABEL_PREDICATES:
                 predicates = new List<HSPPredicate>( predicateParser.ParseNode(node) );
             break;

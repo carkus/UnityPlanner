@@ -53,5 +53,156 @@
                 }
             }
         }
-    ]
+    ],
+"predicates": [
+        {
+            "robot-at": {
+                "x": {
+                    "room": {}
+                }
+            },
+            "object-at": {
+                "x": {
+                    "object": {}
+                },
+                "y": {
+                    "room": {}
+                }
+            },
+            "free": {
+                "x": {
+                    "arm": {}
+                }
+            },
+            "carry": {
+                "x": {
+                    "object": {}
+                },
+                "y": {
+                    "arm": {}
+                }
+            }
+        }
+    ],
+    "operations": [
+        {
+            "move": {
+                "parameters": {
+                    "x": {
+                        "room": {}
+                    },
+                    "y": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "robot-at": {
+                        "x": {}
+                    },
+                    "*not": {
+                        "=" : {}
+                    }
+                },
+                "effect": {
+                    "positive": {
+                        "robot-at": {
+                            "y": {}
+                        }
+                    },
+                    "negative": {
+                        "robot-at": {
+                            "x": {}
+                        }
+                    }
+                }
+            },
+            "pickup": {
+                "parameters": {
+                    "x": {
+                        "object": {}
+                    },
+                    "y": {
+                        "arm": {}
+                    },
+                    "z": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "object-at": {
+                        "x": {
+                            "z": {}
+                        }                        
+                    },
+                    "free": {
+                        "y": {}
+                    },
+                    "robot-at": {
+                        "z": {}
+                    }
+                },
+                "effect": {
+                    "positive": {
+                        "carry": {
+                            "x": {
+                                "y": {}
+                            }                            
+                        }
+                    },
+                    "negative": {
+                        "object-at": {
+                            "x": {
+                                "z": {}
+                            }                            
+                        },
+                        "free": {
+                            "y": {}
+                        }
+                    }
+                }
+            },
+            "putdown": {
+                "parameters": {
+                    "x": {
+                        "object": {}
+                    },
+                    "y": {
+                        "arm": {}
+                    },
+                    "z": {
+                        "room": {}
+                    }
+                },
+                "precondition": {
+                    "carry": {
+                        "x": {
+                            "y": {}
+                        }       
+                    },
+                    "robot-at": {
+                        "z": {}
+                    }
+                },
+                "effect": {
+                    "positive": {
+                        "object-at": {
+                            "x": {
+                                "z": {}
+                            }
+                        },
+                        "free": {
+                            "y": {}
+                        }
+                    },
+                    "negative": {
+                        "carry": {
+                            "x": {
+                                "y": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]    
 }

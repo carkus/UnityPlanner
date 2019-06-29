@@ -20,16 +20,14 @@ public class PlanManager
     private Dictionary <string, Plan> planStack = new Dictionary <string, Plan>();
     private List<Plan> planAgenda = new List<Plan>();
 
-    private PreProcessor _processor;
-    private WorldManager _world;
+    private PreProcessor processor;
 
-    JSONParser _domain;
-    JSONParser _problem; 
+    JSONParser domain;
+    JSONParser problem; 
 
     private Boolean awake = false;
 
-    public PlanManager (WorldManager world) {
-        _world = world;
+    public PlanManager () {
         awake = true;
     }
 
@@ -42,7 +40,7 @@ public class PlanManager
                     if (!planStack.ContainsKey(planAgenda[i].getLabel()) && planAgenda[i].isAccessible()) {
                         planAgenda[i].setAccessible(false);
                         planStack.Add(planAgenda[i].getLabel(), planAgenda[i]);
-                        initPlanner(planAgenda[i].getLabel(), planAgenda[i].getDomainLabel(), planAgenda[i].getProblemLabel());
+                        initPlanner(planAgenda[i]);
                         planAgenda.RemoveAt(i);
                     }
                 }                
@@ -56,8 +54,8 @@ public class PlanManager
                             printPlanActions(planStack[item.Key]);
                             
                             //Send plan into the world
-                            planStack[item.Key].setProblem(_problem);
-                            _world.addPlanToWorld(planStack[item.Key]);
+                            planStack[item.Key].setProblem(problem);
+                            //_world.addPlanToWorld(planStack[item.Key]);
 
                             //Set inaccessible in this scope 
                             planStack[item.Key].setAccessible(false);
@@ -66,37 +64,40 @@ public class PlanManager
                 }
             }
         }
-
     }
 
-    public void addNewPlan(string _label, string _dname, string _pname) {
-        Plan plan = new Plan(_label, _dname, _pname, null);
+    public void addProblemToAgenda(string _label, string _dname, string _pname, List<OBase> _objects) {
+        Plan plan = new Plan(_label, _dname, _pname, _objects);
         plan.setAccessible(true);
         planAgenda.Add(plan);
     }
     
-    private void initPlanner(string _label, string _dname, string _pname) {
-        _domain = parseJSON("./Assets/PDDL/" + _dname + ".json");
-        _problem = parseJSON("./Assets/PDDL/" + _pname + ".json");
-        List<HSPAction> _actions = groundActions(_domain, _problem);
-        callPlanner(_label, _problem, _actions);
+    private void initPlanner(Plan _agenda) {
+        domain = parseJSON("./Assets/PDDL/" + _agenda.getDomainLabel() + ".json");
+        problem = parseJSON("./Assets/PDDL/" + _agenda.getProblemLabel() + ".json");
+        callPlanner(_agenda, problem);
     }
 
-    private async void callPlanner(string _planId, JSONParser _problem, List<HSPAction> _actions) {
+    private async void callPlanner(Plan _plan, JSONParser _problem) {
+        
+        //ground action uses problem objects which need top be derived from world:
+        List<HSPAction> actions = groundActions(domain.operations, _plan.getPlanObjects());
 
         Stopwatch watch = new Stopwatch();
         watch.Start();
             
         ProgressionPlanner _planner = new ProgressionPlanner();
-        Task<List<HSPNode>> planTask = _planner.PerformPlan(_problem.state, _problem.goal, _actions);
+        Task<List<HSPNode>> planTask = _planner.PerformPlan(_problem.state, _problem.goal, actions);
         List<HSPNode> plan = await planTask;
+        _plan.setPlan(plan);
 
         watch.Stop();
 
-        UnityEngine.Debug.Log(_planId + " : Time taken: " + watch.Elapsed.TotalSeconds.ToString());
+        string planKey = _plan.getLabel();
+        UnityEngine.Debug.Log(planKey + " : Time taken: " + watch.Elapsed.TotalSeconds.ToString());
 
-        planStack[_planId].setPlan(plan);
-        planStack[_planId].setAccessible(true);
+        //planStack[planKey].setPlan(_plan);
+        planStack[planKey].setAccessible(true);
 
     }
 
@@ -106,11 +107,19 @@ public class PlanManager
         return parse;
     }
 
-    private List<HSPAction> groundActions(JSONParser _domain, JSONParser _problem) {
+    private List<HSPAction> groundActions(List<HSPOperator> _operations, List<OBase> _objects) {
         List<HSPAction> actions = new List<HSPAction>();
-        _processor = PreProcessor.Instance;
-        actions = _processor.groundActions(_domain.operations, _problem.objects);
+        processor = PreProcessor.Instance;
+        actions = processor.groundActions(_operations, getObjectPredicates(_objects));
         return actions;
+    }
+
+    private List<HSPPredicate> getObjectPredicates(List<OBase> _objects) {
+        List<HSPPredicate> predicates = new List<HSPPredicate>();
+        foreach(OBase obj in _objects) {
+            predicates.Add(obj.getPredicate());
+        }
+        return predicates;
     }
 
     private void printPlanActions(Plan plan) {

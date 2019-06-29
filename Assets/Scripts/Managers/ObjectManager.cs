@@ -1,10 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+using JsonToDataContract;
 
 public class ObjectManager : MonoBehaviour
 {
-    private GameObject[] citizens;
+    
+    private Dictionary<string, List<Tuple<string, string, PrimitiveType?>>> objTuples;
+    private IDictionary<string, OBase> objectList;
 
     //public Transform[] spawnPoints;         // An array of the spawn points this enemy can spawn from.
     //public float spawnTime = 3f;            // How long between each spawn.
@@ -12,11 +19,19 @@ public class ObjectManager : MonoBehaviour
     public NavMeshSurface surface;
     public NavMeshBaker navMeshBaker;
 
+
     void Awake()
     {
         navMeshBaker = GameObject.Find("main").AddComponent(typeof(NavMeshBaker)) as NavMeshBaker;
+        
+        objTuples = new Dictionary<string, List<Tuple<string, string, PrimitiveType?>>>();
+        objectList = new Dictionary<string, OBase>();
+
+        buildStaticWorld();
+
         // Call the Spawn function after a delay of the spawnTime and then continue to call after the same amount of time.
         //InvokeRepeating ("Spawn", spawnTime, spawnTime);
+
     }
 
     public void frameTick()
@@ -29,68 +44,119 @@ public class ObjectManager : MonoBehaviour
         // Set the displayed text to be the word "Score" followed by the score value.
         //text.text = "Score: " + score;
     }
+    
+    public void findObjects() {
 
-    public void setWorld(OBase[] worldObjects)
+        addPlanObject("room", "room1", PrimitiveType.Cube);
+        addPlanObject("room", "room2", PrimitiveType.Cube);
+        addPlanObject("room", "room3", PrimitiveType.Cube);
+        addPlanObject("room", "room4", PrimitiveType.Cube);
+
+        addPlanObject("object", "object1", PrimitiveType.Sphere);
+        addPlanObject("object", "object2", PrimitiveType.Sphere);
+        addPlanObject("object", "object3", PrimitiveType.Sphere);
+        addPlanObject("object", "object4", PrimitiveType.Sphere);
+    }
+
+
+    public void setWorldObjects()
     {
+        buildPlanObjects();
+    }
 
+    private void buildPlanObjects()
+    {
+        foreach (KeyValuePair<string, OBase> obj in objectList) {
+            OType randomType = (OType)(UnityEngine.Random.Range(1, System.Enum.GetNames(typeof(OType)).Length));
+            
+            int randomX = (int)(UnityEngine.Random.Range(-15, 15));
+            int randomZ = (int)(UnityEngine.Random.Range(-15, 15));
 
+            (obj.Value).build();
 
-        OBase plane = new OBase(PrimitiveType.Plane);
-        plane.setScale(10f, 1f, 10f);
+            if ((obj.Value).getPrimitive().HasValue) {
+                (obj.Value).setPosition(new Vector3(randomX, 0, randomZ));
+                (obj.Value).setType(randomType);
+
+                (obj.Value).makeObstacle();
+                (obj.Value).redraw();
+            }
+        }
+    }
+
+    private void buildStaticWorld()
+    {
+        OBase plane = new OBase();
+        plane.setPrimitive(PrimitiveType.Plane);
+        plane.build();
+        
         plane.setPosition(new Vector3(5f, 0, 5f));
+        plane.setScale(new Vector3(10f, 1f, 10f));
+        plane.redraw();
 
         NavMeshSurface surface = plane.getBody().AddComponent(typeof(NavMeshSurface)) as NavMeshSurface;
 
         navMeshBaker.addMeshSurface(surface);
         navMeshBaker.bakeNavMeshSurfaces();
+    }
 
+    public void addAgent() 
+    {
+        OBase agent = new OBase();
+        agent.setPrimitive(PrimitiveType.Capsule);
+        agent.build();
 
+        agent.setName("agent");
+        agent.setType(OType.Agent);
+        agent.setPosition(new Vector3(0, 0, 0));
+        agent.makeAgent();
+        agent.redraw();
+        
+        addPlanObject("arm", "left", null);
+        addPlanObject("arm", "right", null);
+    }
 
-
-        //PrimitiveType type = PrimitiveType.Cube;
-        OType randomType;
-
-        for (int i = 0; i < 10; i++)
+    private void addPlanObject(string _type, string _name, PrimitiveType? _primitive)
+    {
+        Tuple<string, string, PrimitiveType?> obj = new Tuple<string, string, PrimitiveType?>(_type, _name, _primitive);
+        if (!objTuples.ContainsKey(_type))
         {
-            for (int j = 0; j < 10; j++)
+            objTuples[_type] = new List<Tuple<string, string, PrimitiveType?>>();
+        }
+        objTuples[_type].Add(obj);
+    }
+
+    public void addPlanObjects()
+    {
+        foreach (KeyValuePair<string, List<Tuple<string, string, PrimitiveType?>>> types in objTuples)
+        {
+            foreach (Tuple<string, string, PrimitiveType?> obj in types.Value)
             {
-                OBase obj = new OBase(PrimitiveType.Cube);
-                randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
-                obj.setPosition(new Vector3(i * 4, 0, j * 4));
-                obj.setType(randomType);
-                obj.setColor(randomType);
-                obj.setScale(2f, 2f, 2f);
-                obj.makeObstacle();
+                string name = obj.Item2;
+                PrimitiveType? primitive = obj.Item3;
+                string type = types.Key;
+
+                List<HSPTerm> args = new List<HSPTerm>();
+                args.Add(new HSPTerm(name, type, null));
+
+                OBase newObject = new OBase();
+                newObject.setPredicate(new HSPPredicate(type, args));
+                newObject.setPrimitive(primitive);
+                newObject.setName(name);
+                
+                objectList.Add(name, newObject);
             }
         }
+    }
 
-        for (int i = 0; i < 10; i++)
+    public List<OBase> getObjectList()
+    {
+        List<OBase> objects = new List<OBase>();
+        foreach (KeyValuePair<string, OBase> obj in objectList)
         {
-            for (int j = 0; j < 10; j++)
-            {
-
-
-                OBase agent = new OBase(PrimitiveType.Sphere);
-                randomType = (OType)(UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(OType)).Length));
-                agent.setPosition(new Vector3(i * 4, 0, j * 4));
-                agent.setType(randomType);
-                agent.setColor(randomType);
-                agent.makeAgent();
-
-                Vector3 targetVector = new Vector3(50f, 0, 20f);
-                agent.setDestination(targetVector);
-
-            }
-
+            objects.Add(objectList[obj.Key]);
         }
-
-
-
-        //surface.BuildNavMesh();
-
-
-
-
+        return objects;
     }
 
     void Spawn()

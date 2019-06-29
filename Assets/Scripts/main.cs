@@ -30,34 +30,32 @@ public class main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {        
-
         worldManager = new WorldManager();
+        planManager = new PlanManager();
         
-        planManager = new PlanManager(worldManager);
-        planManager.addNewPlan("blueraincoat", "robot", "robot-3");
 
-
-
-
-
+        //Ask the Object Manager to return relevant objects
         
-        //planManager.initPlanner();
-        //for (int a=0; a<5; a++) {
-        //}
-        //planManager.callPlanner();
+        objectManager.addAgent();
+        objectManager.findObjects();
+        objectManager.addPlanObjects();
         
-        
-        worldManager.startWorld();
+        planManager.addProblemToAgenda("blueraincoat", "robot", "robot-4", objectManager.getObjectList());
 
-        //objectManager = AddComponent(typeof(SphereCollider)) as SphereCollider;
-        objectManager.setWorld(worldManager.worldObjects);
+        objectManager.setWorldObjects();
+
+
+        //worldManager.addObjectsToWorld(objects);
+        //worldManager.startWorld();
+
+
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        worldManager.frameTick();
+        //worldManager.frameTick();
         //objectManager.frameTick();
         planManager.frameTick();
     }
