@@ -27,7 +27,7 @@ public class ObjectManager : MonoBehaviour
         objTuples = new Dictionary<string, List<Tuple<string, string, PrimitiveType?>>>();
         objectList = new Dictionary<string, OBase>();
 
-        buildStaticWorld();
+        //buildStaticWorld();
 
         // Call the Spawn function after a delay of the spawnTime and then continue to call after the same amount of time.
         //InvokeRepeating ("Spawn", spawnTime, spawnTime);

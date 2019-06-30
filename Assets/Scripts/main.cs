@@ -14,6 +14,7 @@ public class main : MonoBehaviour
     //Managers
     private WorldManager worldManager;//environment and world parent
     private ObjectManager objectManager;//will handle object sent to it by the world
+    private SceneManager sceneManager;//ganerate landscape
     private PlanManager planManager;
     private ScoreManager scoreManager;//when one is required...
 
@@ -25,6 +26,7 @@ public class main : MonoBehaviour
     void Awake()
     {
         objectManager = GameObject.Find("main").AddComponent(typeof(ObjectManager)) as ObjectManager;
+        //sceneManager = GameObject.Find("main").AddComponent(typeof(SceneManager)) as SceneManager;
     }   
 
     // Start is called before the first frame update
@@ -35,7 +37,7 @@ public class main : MonoBehaviour
         
 
         //Ask the Object Manager to return relevant objects
-        
+
         objectManager.addAgent();
         objectManager.findObjects();
         objectManager.addPlanObjects();
